@@ -33,7 +33,7 @@ class board1():
                          ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
                          ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
                          ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
-                         ['wrook1', 'wknight1', 'wbishop1', 'wqueen', 'wking', 'wbishop2', 'wknight2', 'wrook2']]
+                         ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
     def display(self):#displays board
         for x in range(8):
             pprint.pprint(self.board[x],compact=False,width=100)
@@ -146,7 +146,7 @@ class King(piece):
         else:
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves():
+    def get_moves(self):
         pass
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -239,7 +239,7 @@ class Pawn(piece):
 
     def get_moves(self):#calculates available moves
         
-        if self.colour==turn:
+##        if self.colour==turn:
                 
 ##            if self.movedyet==False:#
           
@@ -407,10 +407,10 @@ def move():
         print("thisbit")
         try:
             
-            print(mousex,mousey,currentPiece,)
+            print(mousex,mousey,currentPiece)
             SquareTo=eval(currentPiece).get_moves()
             
-            eval(currentPiece).moveit(SquareTo)
+##            eval(currentPiece).moveit(SquareTo)
             
             
             
@@ -559,4 +559,3 @@ if __name__=="__main__":
 ##            wknight2
 ##            wrook2  
 #use breadth first to check for sqaures that can be taken.
-#test
