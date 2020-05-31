@@ -559,3 +559,4 @@ if __name__=="__main__":
 ##            wknight2
 ##            wrook2  
 #use breadth first to check for sqaures that can be taken.
+#test
