@@ -50,11 +50,22 @@ class board1():
            
            return False
     def enemysquare(self,colour,x,y):
-        pass
-##        if colour=="black":
-##            if self.board[y][x]
-##        else:
-##            
+#        pass
+        try:
+            character=self.board[y][x]
+            if colour=="black":
+                 
+                if character[0]=='w':
+                       return True  
+            else:
+                if character[0]=='b':
+                    return True
+        except IndexError:
+            print("empty")
+            return False
+              
+              
+            
             
         
         
@@ -116,7 +127,7 @@ class piece():
             if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>x*75 and mouse1[1]<(x*75)+75):
                 
                 SquareToMoveTo=availableSquarex[counter],x
-                
+                print("moving")
             counter+=1
         print("yippee")
         return SquareToMoveTo 
@@ -283,6 +294,7 @@ class Pawn(piece):
                                 availableSquares.append(squarey)
                                 availableSquarex.append(squarex)
                             
+                            
                         else:
                             squarey=self.posy+1
                             squarex=self.posx+x
@@ -290,7 +302,8 @@ class Pawn(piece):
                             if (theboard.enemysquare("black",squarex,squarey))==True:
                             
                                 availableSquares.append(squarey)
-                                availableSquarex.append(squarex)                        
+                                availableSquarex.append(squarex)
+                            
                     
                 SquareToMoveTo =self.showSquares(availableSquares, availableSquarex)                    
                 return SquareToMoveTo
