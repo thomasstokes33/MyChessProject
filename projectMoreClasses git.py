@@ -114,6 +114,7 @@ class piece():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
+                    #maybe replace with return statement
         while clicked1[0]==1:
             pygame.event.get()
             clicked1=pygame.mouse.get_pressed()
@@ -121,6 +122,7 @@ class piece():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
+                    #maybe replace with return statement so I don't use quit()
         counter=0
         SquareToMoveTo=None,None
         for x in availableSquarey:
@@ -130,14 +132,14 @@ class piece():
                 print("moving")
             counter+=1
         print("yippee")
-        return SquareToMoveTo 
+        return SquareToMoveTo
 
     def moveit(self,thesquare):
         squarex=thesquare[0]
         squarey=thesquare[1]
-        print("x",squarex,"y",squarey)
-        if squarex!=None and sqaurey!=None:
-             if self.posx==squarex and self.posy==sqaurey:
+        print("moveit","x",squarex,"y",squarey)
+        if squarex!=None and squarey!=None:
+             if self.posx==squarex and self.posy==squarey:
                  pass
                  
                  
@@ -276,7 +278,7 @@ class Pawn(piece):
                         availableSquares.append(square)
                         availableSquarex.append(self.posx)
                         
-                    print(availableSquares)
+                print(availableSquares)
                     
 
               
@@ -409,32 +411,66 @@ def pieceInPos(mousex,mousey):
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
-def move():
+def move(moving1,currentmovingpiece,SquareTo):
 
-    global currentPiece
+     
     mousex,mousey,currentPiece=getmouse()
-    if mousex!=None and mousey!=None:
-         
-        
-        
-        print("thisbit")
-        try:
-            
-            print(mousex,mousey,currentPiece)
-            SquareTo=eval(currentPiece).get_moves()
-            
-##            eval(currentPiece).moveit(SquareTo)
-            
-            
-            
-            print()
-        except SyntaxError:
-            print(mousex,mousey,"Square empty")
-            print()
 
-   
+    try:
+       
+        if moving1==True:
+               print("in loop")
+               eval(currentmovingpiece).moveit(SquareTo)
+        else:
+            if mousex!=None and mousey!=None:
+                try:
+                        print("hello")
+                        print(mousex,mousey,currentPiece)
+                        SquareTo=eval(currentPiece).get_moves()
+                        if SquareTo != (None,None):
+                            
+                            currentmovingpiece=currentPiece
+                            moving1=True
+                        print(SquareTo)
+            ##          eval(currentPiece).moveit(SquareTo)
+                        
+                        
+                        
+                        print()
+                except SyntaxError:
+                        print(mousex,mousey,"Square empty")
+                        print()
+            
+            
+    except UnboundLocalError:
+
+        if mousex!=None and mousey!=None:
+                try:
+                        print("hello")
+                        print(mousex,mousey,currentPiece)
+                        SquareTo=eval(currentPiece).get_moves()
+                        if SquareTo != (None,None):
+                            currentmovingpiece=currentPiece
+                            
+                            moving1=True
+                        print(SquareTo)
+            ##          eval(currentPiece).moveit(SquareTo)
+                        
+                        
+                        
+                        print()
+                except SyntaxError:
+                        print(mousex,mousey,"Square empty")
+                        print()
+    try:
+        print("returning")
+        return moving1,currentmovingpiece,SquareTo
+    except:
+        print("not returning")
+        return None
      
 def update():
+    #idea: when pieces are taken remove from a list which is ran through for loop.
     chessDisplay.blit(chessBoard,(0,0))
     bpawn1.update()
     bpawn2.update()
@@ -473,15 +509,16 @@ def update():
 def start():
     
     gameExit=False 
-    
+    returned,current,squ=None,None,None
     while not gameExit:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()    
                 quit()
+                #gameExit=True
             
 
-            move()
+            returned,current,squ=move(returned,current,squ)
             update()
             pygame.display.update()
             clock.tick(10)
@@ -534,7 +571,9 @@ if __name__=="__main__":
     wrook2=Rook("rook",7,7,"white")
     turn='white'
     
+    
     start()
+##    pygame.quit() 
 
 
 
