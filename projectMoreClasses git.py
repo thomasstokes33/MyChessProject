@@ -1,4 +1,4 @@
-#1,1 = 0,0
+ #1,1 = 0,0
 import pprint
 import pygame
 import time
@@ -135,12 +135,13 @@ class piece():
         return SquareToMoveTo
 
     def moveit(self,thesquare):
+        #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
         squarex=thesquare[0]
         squarey=thesquare[1]
         print("moveit","x",squarex,"y",squarey)
         if squarex!=None and squarey!=None:
              if self.posx==squarex and self.posy==squarey:
-                 pass
+                 pass 
                  
                  
      
@@ -412,7 +413,7 @@ def pieceInPos(mousex,mousey):
     return piece
 
 def move(moving1,currentmovingpiece,SquareTo):
-
+ 
      
     mousex,mousey,currentPiece=getmouse()
 
@@ -521,7 +522,7 @@ def start():
             returned,current,squ=move(returned,current,squ)
             update()
             pygame.display.update()
-            clock.tick(10)
+            clock.tick(30)
             
         
         
