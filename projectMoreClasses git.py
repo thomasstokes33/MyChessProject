@@ -64,6 +64,12 @@ class board1():
         except IndexError:
             print("empty")
             return False
+        
+    def move(self,currentx,currenty,newx,newy):
+        record=self.board[currenty][currentx]
+        self.board[currenty][currentx]=''
+        self.board[newy][newx]=record
+        self.display()
               
               
             
@@ -96,7 +102,7 @@ class piece():
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
 
-    def showSquares(self,availableSquarey,availableSquarex):
+    def showSquares(self,availableSquarey,availableSquarex,xPerFrame,yPerFrame):
         counter=0
         for x in availableSquarey:
                 
@@ -141,12 +147,14 @@ class piece():
         return SquareToMoveTo,xPerFrame,yPerFrame
 
     def moveit(self,thesquare,xPerFrame,yPerFrame):
+        lastposx=self.posx
+        lastposy=self.posy
         #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
         squarex=thesquare[0]
         squarey=thesquare[1]
         print("moveit","x",squarex,"y",squarey,xPerFrame)
         
-        while round(self.posx)!=squarex or round(self.posy)!=squarey:
+        while round(self.posx,1)!=squarex or round(self.posy,1)!=squarey:
             clicked1=pygame.mouse.get_pressed()
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
@@ -159,7 +167,8 @@ class piece():
             
         self.posx=squarex
         self.posy=squarey
-        print("here")
+        theboard.move(lastposx,lastposy,squarex,squarey)
+        self.movedyet=True
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -167,8 +176,8 @@ class piece():
         movetoy=movetoy*75
         currentx=self.posx*75
         currenty=self.posy*75
-        hor=abs (currentx-movetox)
-        vert=(currenty-movetoy)
+        hor=abs(currentx-movetox)
+        vert=abs(currenty-movetoy)
         print("hor: ",hor,"vert: ",vert)  #horizontal and vertical distance
 
         distance=math.sqrt((abs(hor))**2+(abs(vert))**2)
@@ -181,7 +190,14 @@ class piece():
         print("framestaken",framestaken)
         xPerFrame=(hor/framestaken)
         yPerFrame=(vert/framestaken)
-        print("x move",xPerFrame,"y move",yPerFrame)        
+        print("x move",xPerFrame,"y move",yPerFrame)
+        if movetox<currentx:
+            xPerFrame=-xPerFrame
+            
+
+        if movetoy<currenty:
+            yPerFrame=-yPerFrame
+                    
         return xPerFrame,yPerFrame
                  
      
@@ -200,8 +216,9 @@ class King(piece):
         else:
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self):
-        pass
+    def get_moves(self,xPerFrame,yPerFrame):
+        SquareTo=None,None
+        return SquareTo,xPerFrame,yPerFrame
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -218,8 +235,9 @@ class Queen(piece):
             self.image=pygame.image.load('whitequeen.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self):
-        pass
+    def get_moves(self,xPerFrame,yPerFrame):
+        SquareTo=None,None
+        return SquareTo,xPerFrame,yPerFrame
 class Knight(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -236,8 +254,9 @@ class Knight(piece):
             self.image=pygame.image.load('whiteknight.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self):
-        pass
+    def get_moves(self,xPerFrame,yPerFrame):
+        SquareTo=None,None
+        return SquareTo,xPerFrame,yPerFrame
 class Rook(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -253,8 +272,9 @@ class Rook(piece):
         else:
             self.image=pygame.image.load('whiterook.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self):
-        pass
+    def get_moves(self,xPerFrame,yPerFrame):
+        SquareTo=None,None
+        return SquareTo,xPerFrame,yPerFrame
         
 class Bishop(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -271,8 +291,9 @@ class Bishop(piece):
         else:
             self.image=pygame.image.load('whitebishop.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self):
-        pass
+    def get_moves(self,xPerFrame,yPerFrame):
+        SquareTo=None,None
+        return SquareTo,xPerFrame,yPerFrame
 
 class Pawn(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -291,7 +312,7 @@ class Pawn(piece):
             chessDisplay.blit(self.image,((self.posx)*75,bottom2))
 
 
-    def get_moves(self):#calculates available moves
+    def get_moves(self,xPerFrame,yPerFrame):#calculates available moves
         
 ##        if self.colour==turn:
                 
@@ -347,9 +368,9 @@ class Pawn(piece):
                                 availableSquares.append(squarey)
                                 availableSquarex.append(squarex)
                             
-                    
-                SquareToMoveTo=self.showSquares(availableSquares, availableSquarex)                    
-                return SquareToMoveTo
+                
+                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                return SquareToMoveTo,xPerFrame,yPerFrame
         
 ##            else:#the pawn moves 1 most of the time
 ##                      
@@ -457,52 +478,36 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame):
      
     mousex,mousey,currentPiece=getmouse()
 
-    try:
-       
-        if moving1==True:
-               
-               moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame)
-        else:
-            if mousex!=None and mousey!=None:
-                try:
-                        print("hello")
-                        print(mousex,mousey,currentPiece)
-                        SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves()
-                        if SquareTo != (None,None):
-                            
-                            currentmovingpiece=currentPiece
-                            moving1=True
-                        print(SquareTo)
-            ##          eval(currentPiece).moveit(SquareTo)
-                        
-                        
-                        
-                        print()
-                except SyntaxError:
-                        print(mousex,mousey,"Square empty")
-                        print()
-            
-            
-    except UnboundLocalError:
 
-        if mousex!=None and mousey!=None:
-                try:
-                        print("hello")
-                        print(mousex,mousey,currentPiece)
-                        SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves()
-                        if SquareTo != (None,None):
-                            currentmovingpiece=currentPiece
-                            
-                            moving1=True
-                        print(SquareTo)
-            ##          eval(currentPiece).moveit(SquareTo)
-                        
-                        
-                        
-                        print()
-                except SyntaxError:
-                        print(mousex,mousey,"Square empty")
-                        print()
+               
+    
+
+    if mousex!=None and mousey!=None:
+        try:
+                print("hello")
+                print(mousex,mousey,currentPiece)
+                
+                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame)
+                print(SquareTo,xPerFrame,yPerFrame)
+                if SquareTo != (None,None):
+                    
+                    currentmovingpiece=currentPiece
+                    
+                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame)
+                
+    ##          eval(currentPiece).moveit(SquareTo)
+                
+                
+                
+                print()
+        except SyntaxError:
+                print(mousex,mousey,"Square empty")
+                print()
+
+
+
+
+
     try:
  
         return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame
