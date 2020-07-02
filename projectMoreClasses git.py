@@ -1,7 +1,8 @@
- #1,1 = 0,0
+#1,1 = 0,0,
 import pprint
 import pygame
 import time
+import math
 pygame.init()
 displayWidth=600
 displayHeight=600
@@ -125,24 +126,63 @@ class piece():
                     #maybe replace with return statement so I don't use quit()
         counter=0
         SquareToMoveTo=None,None
+        xPerFrame,yPerFrame=None,None
         for x in availableSquarey:
             if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>x*75 and mouse1[1]<(x*75)+75):
                 
                 SquareToMoveTo=availableSquarex[counter],x
                 print("moving")
+                xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1])
+
+
+                
             counter+=1
         print("yippee")
-        return SquareToMoveTo
+        return SquareToMoveTo,xPerFrame,yPerFrame
 
-    def moveit(self,thesquare):
+    def moveit(self,thesquare,xPerFrame,yPerFrame):
         #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
         squarex=thesquare[0]
         squarey=thesquare[1]
-        print("moveit","x",squarex,"y",squarey)
-        if squarex!=None and squarey!=None:
-             if self.posx==squarex and self.posy==squarey:
-                 pass 
-                 
+        print("moveit","x",squarex,"y",squarey,xPerFrame)
+        
+        while round(self.posx)!=squarex or round(self.posy)!=squarey:
+            clicked1=pygame.mouse.get_pressed()
+            self.posx=self.posx+(xPerFrame/75)
+            self.posy=self.posy+(yPerFrame/75)
+            update()
+            print(round(self.posx),round(self.posy))
+            pygame.display.update()
+            clock.tick(30)
+            print(self.posx,self.posy)
+            
+            
+        self.posx=squarex
+        self.posy=squarey
+        print("here")
+        return False
+    
+    def distancePerFrame(self,movetox,movetoy):
+        movetox=movetox*75
+        movetoy=movetoy*75
+        currentx=self.posx*75
+        currenty=self.posy*75
+        hor=abs (currentx-movetox)
+        vert=(currenty-movetoy)
+        print("hor: ",hor,"vert: ",vert)  #horizontal and vertical distance
+
+        distance=math.sqrt((abs(hor))**2+(abs(vert))**2)
+        print("d:",distance)
+        speed=210 #unitspersecond
+        time=distance/speed
+        print("t: "+str(time)) #time
+
+        framestaken=round((time/1)*30)
+        print("framestaken",framestaken)
+        xPerFrame=(hor/framestaken)
+        yPerFrame=(vert/framestaken)
+        print("x move",xPerFrame,"y move",yPerFrame)        
+        return xPerFrame,yPerFrame
                  
      
 class King(piece):
@@ -308,7 +348,7 @@ class Pawn(piece):
                                 availableSquarex.append(squarex)
                             
                     
-                SquareToMoveTo =self.showSquares(availableSquares, availableSquarex)                    
+                SquareToMoveTo=self.showSquares(availableSquares, availableSquarex)                    
                 return SquareToMoveTo
         
 ##            else:#the pawn moves 1 most of the time
@@ -412,7 +452,7 @@ def pieceInPos(mousex,mousey):
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
-def move(moving1,currentmovingpiece,SquareTo):
+def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame):
  
      
     mousex,mousey,currentPiece=getmouse()
@@ -420,14 +460,14 @@ def move(moving1,currentmovingpiece,SquareTo):
     try:
        
         if moving1==True:
-               print("in loop")
-               eval(currentmovingpiece).moveit(SquareTo)
+               
+               moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame)
         else:
             if mousex!=None and mousey!=None:
                 try:
                         print("hello")
                         print(mousex,mousey,currentPiece)
-                        SquareTo=eval(currentPiece).get_moves()
+                        SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves()
                         if SquareTo != (None,None):
                             
                             currentmovingpiece=currentPiece
@@ -449,7 +489,7 @@ def move(moving1,currentmovingpiece,SquareTo):
                 try:
                         print("hello")
                         print(mousex,mousey,currentPiece)
-                        SquareTo=eval(currentPiece).get_moves()
+                        SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves()
                         if SquareTo != (None,None):
                             currentmovingpiece=currentPiece
                             
@@ -464,14 +504,15 @@ def move(moving1,currentmovingpiece,SquareTo):
                         print(mousex,mousey,"Square empty")
                         print()
     try:
-        print("returning")
-        return moving1,currentmovingpiece,SquareTo
+ 
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame
     except:
         print("not returning")
         return None
      
 def update():
     #idea: when pieces are taken remove from a list which is ran through for loop.
+    
     chessDisplay.blit(chessBoard,(0,0))
     bpawn1.update()
     bpawn2.update()
@@ -510,7 +551,7 @@ def update():
 def start():
     
     gameExit=False 
-    returned,current,squ=None,None,None
+    returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
     while not gameExit:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -519,7 +560,7 @@ def start():
                 #gameExit=True
             
 
-            returned,current,squ=move(returned,current,squ)
+            returned,current,squ,xPerFrame,yPerFrame=move(returned,current,squ,xPerFrame,yPerFrame)
             update()
             pygame.display.update()
             clock.tick(30)

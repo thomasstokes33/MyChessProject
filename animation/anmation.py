@@ -14,9 +14,9 @@ chessDisplay.blit(chessBoard,(0,0))
 image=pygame.image.load("blackpawn.png")
 chessDisplay.blit(image,((0)*75,1*75))
 currentx=0*75
-currenty=1*75
+currenty=0*75
 movetox=0*75
-movetoy=3*75
+movetoy=1*75
 x=currentx
 y=currenty
 

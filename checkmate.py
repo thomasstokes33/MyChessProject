@@ -71,11 +71,7 @@ def minicheck(board,colour,x,y):
        
 
 
-##then the check algorithm
 
-##then the checkmate algorithm
-
-## for en passant check if current piece is pawn, if last moved piece was pawn and that pawn is adjacent now.
 def isemptySquare(board,x,y):
        
         if board[y][x] == '':
@@ -117,3 +113,12 @@ self.board[movedtoy][movedtoy]=record
 if ( minicheck(self.boardtemp,colour,movedtox,movedtoy) ==False) :
     availableSquares.append(square)
     availableSquarex.append(self.posx)
+
+##then the check algorithm which is basically the same as above
+
+##then the checkmate algorithm
+
+
+## for en passant check if current piece is pawn, if last moved piece was pawn and that pawn is adjacent now.
+##for taking pieces I suggest a list where update pieces are removed and removed from board array. 
+##for upgrading pawns, create new piece. 
