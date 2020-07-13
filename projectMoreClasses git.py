@@ -43,13 +43,14 @@ class board1():
         return self.board[mousey][mousex]
         
     def emptySquare(self,x,y):
-       
+        print(x,y)
         if self.board[y][x] == '':
-           
+
            return True
         else:
-           
+
            return False
+        
     def enemysquare(self,colour,x,y):
 #        pass
         try:
@@ -159,10 +160,10 @@ class piece():
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
             update()
-            print(round(self.posx),round(self.posy))
+            #print(round(self.posx),round(self.posy))
             pygame.display.update()
             clock.tick(30)
-            print(self.posx,self.posy)
+            #print(self.posx,self.posy)
             
             
         self.posx=squarex
@@ -216,9 +217,11 @@ class King(piece):
         else:
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame):
-        SquareTo=None,None
-        return SquareTo,xPerFrame,yPerFrame
+    def get_moves(self,xPerFrame,yPerFrame,turn):
+
+            SquareTo=None,None
+            return SquareTo,xPerFrame,yPerFrame
+
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -235,9 +238,11 @@ class Queen(piece):
             self.image=pygame.image.load('whitequeen.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self,xPerFrame,yPerFrame):
-        SquareTo=None,None
-        return SquareTo,xPerFrame,yPerFrame
+    def get_moves(self,xPerFrame,yPerFrame,turn):
+
+            SquareTo=None,None
+            return SquareTo,xPerFrame,yPerFrame
+
 class Knight(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -254,9 +259,34 @@ class Knight(piece):
             self.image=pygame.image.load('whiteknight.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self,xPerFrame,yPerFrame):
-        SquareTo=None,None
-        return SquareTo,xPerFrame,yPerFrame
+    def get_moves(self,xPerFrame,yPerFrame,turn):
+        if str(self.colour)==turn:
+                availableSquarex=[]
+                availableSquares=[]
+                squares=[-2]
+                for x in range(1):
+                    pass
+                
+                if (theboard.emptySquare(squarex,square))==True:
+   
+                    availableSquares.append(square)
+                    availableSquarex.append(self.posx)                                 
+
+                       
+
+
+
+
+
+
+            
+                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                return SquareToMoveTo,xPerFrame,yPerFrame
+        else:
+            
+            SquareTo=None,None
+            return SquareTo,xPerFrame,yPerFrame
+
 class Rook(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -272,10 +302,11 @@ class Rook(piece):
         else:
             self.image=pygame.image.load('whiterook.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame):
-        SquareTo=None,None
-        return SquareTo,xPerFrame,yPerFrame
-        
+    def get_moves(self,xPerFrame,yPerFrame,turn):
+
+            SquareTo=None,None
+            return SquareTo,xPerFrame,yPerFrame
+
 class Bishop(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -291,9 +322,11 @@ class Bishop(piece):
         else:
             self.image=pygame.image.load('whitebishop.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame):
-        SquareTo=None,None
-        return SquareTo,xPerFrame,yPerFrame
+    def get_moves(self,xPerFrame,yPerFrame,turn):
+
+            
+            SquareTo=None,None
+            return SquareTo,xPerFrame,yPerFrame
 
 class Pawn(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -312,11 +345,12 @@ class Pawn(piece):
             chessDisplay.blit(self.image,((self.posx)*75,bottom2))
 
 
-    def get_moves(self,xPerFrame,yPerFrame):#calculates available moves
-        
-##        if self.colour==turn:
+    def get_moves(self,xPerFrame,yPerFrame,turn):#calculates available moves
+         print(turn)
+         print(self.colour)
+         if str(self.colour)==turn:
                 
-##            if self.movedyet==False:#
+
           
                 availableSquares=[]
                 availableSquarex=[]
@@ -335,8 +369,9 @@ class Pawn(piece):
                             square=self.posy+x
                         else:
                             square=self.posy+1
-                    if (theboard.emptySquare(self.posx,square))==True:
-       
+                    if (theboard.emptySquare(self.posx,square))==True and square>0:
+                    
+           
                         availableSquares.append(square)
                         availableSquarex.append(self.posx)
                         
@@ -344,7 +379,7 @@ class Pawn(piece):
                     
 
               
-                    
+                   
                 for x in range(-1,2):
                     if x==0:
                         pass
@@ -368,9 +403,16 @@ class Pawn(piece):
                                 availableSquares.append(squarey)
                                 availableSquarex.append(squarex)
                             
-                
-                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
-                return SquareToMoveTo,xPerFrame,yPerFrame
+                if availableSquares== []:
+                    SquareToMoveTo=None,None
+                    return SquareToMoveTo,xPerFrame,yPerFrame
+
+                else:
+                    SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                    return SquareToMoveTo,xPerFrame,yPerFrame
+         else:
+            SquareToMoveTo=None,None
+            return SquareToMoveTo,xPerFrame,yPerFrame
         
 ##            else:#the pawn moves 1 most of the time
 ##                      
@@ -462,7 +504,7 @@ def getmouse():
         
         mousex=mouse[0]//75
         mousey=mouse[1]//75
-        print("x",mousex,"y",mousey)
+
         currentPiece=pieceInPos(mousex,mousey)
         
         
@@ -473,7 +515,7 @@ def pieceInPos(mousex,mousey):
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
-def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame):
+def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
  
      
     mousex,mousey,currentPiece=getmouse()
@@ -484,17 +526,20 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame):
 
     if mousex!=None and mousey!=None:
         try:
-                print("hello")
+
                 print(mousex,mousey,currentPiece)
                 
-                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame)
+                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn)
                 print(SquareTo,xPerFrame,yPerFrame)
                 if SquareTo != (None,None):
                     
                     currentmovingpiece=currentPiece
                     
                     moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame)
-                
+                    if turn =='black':
+                        turn='white'
+                    else:
+                        turn='black'
     ##          eval(currentPiece).moveit(SquareTo)
                 
                 
@@ -509,8 +554,8 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame):
 
 
     try:
- 
-        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame
+
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn
     except:
         print("not returning")
         return None
@@ -553,7 +598,7 @@ def update():
     wknight2.update()
     wrook2.update()  
 
-def start():
+def start(turn):
     
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
@@ -565,7 +610,7 @@ def start():
                 #gameExit=True
             
 
-            returned,current,squ,xPerFrame,yPerFrame=move(returned,current,squ,xPerFrame,yPerFrame)
+            returned,current,squ,xPerFrame,yPerFrame,turn=move(returned,current,squ,xPerFrame,yPerFrame,turn)
             update()
             pygame.display.update()
             clock.tick(30)
@@ -619,7 +664,7 @@ if __name__=="__main__":
     turn='white'
     
     
-    start()
+    start(turn)
 ##    pygame.quit() 
 
 
