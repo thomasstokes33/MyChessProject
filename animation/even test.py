@@ -30,3 +30,4 @@ while eggs:
         print(event)
     pygame.display.update()
     clock.tick(30)
+#hi
