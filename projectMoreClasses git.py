@@ -263,7 +263,7 @@ class Knight(piece):
         if str(self.colour)==turn:
                 availableSquarex=[]
                 availableSquares=[]
-                squares=[-2]
+                squares=[-2 ]
                 for x in range(1):
                     pass
                 
