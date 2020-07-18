@@ -264,8 +264,12 @@ class Knight(piece):
                 availableSquarex=[]
                 availableSquares=[]
                 squares=[-2 ]
-                for x in range(1):
-                    pass
+                long1=[2,-2]
+                short=[1,-1]
+                
+                for x in long1:
+                    for y in short:
+                        squarex=self.posx+x
                 
                 if (theboard.emptySquare(squarex,square))==True:
    
