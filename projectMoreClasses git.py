@@ -45,11 +45,33 @@ class board1():
     def emptySquare(self,x,y):
         print(x,y)
         if self.board[y][x] == '':
+ 
 
            return True
         else:
 
            return False
+    def friendlysquare(self,x,y,colour):
+        try:
+            
+            squareInQuestion=str(self.board[y][x])
+
+            
+            if squareInQuestion=='':
+                return False
+            else:
+                team=squareInQuestion[0]
+                if team=='b' and colour=='black':
+                    return True
+                elif team=='w' and colour=='white':
+                    return True
+                else:
+                    return False
+        except IndexError:
+            print("empty or no enemy")
+             
+
+
         
     def enemysquare(self,colour,x,y):
 #        pass
@@ -63,7 +85,7 @@ class board1():
                 if character[0]=='b':
                     return True
         except IndexError:
-            print("empty")
+            print("empty or no enemy")
             return False
         
     def move(self,currentx,currenty,newx,newy):
@@ -140,7 +162,7 @@ class piece():
                 SquareToMoveTo=availableSquarex[counter],x
                 print("moving")
                 xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1])
-
+ 
 
                 
             counter+=1
@@ -263,20 +285,29 @@ class Knight(piece):
         if str(self.colour)==turn:
                 availableSquarex=[]
                 availableSquares=[]
-                squares=[-2 ]
+       
                 long1=[2,-2]
                 short=[1,-1]
                 
                 for x in long1:
                     for y in short:
                         squarex=self.posx+x
+                        square=self.posy+y 
                 
-                if (theboard.emptySquare(squarex,square))==True:
-   
-                    availableSquares.append(square)
-                    availableSquarex.append(self.posx)                                 
+                        if (theboard.friendlysquare(squarex,square,self.colour))==False: 
 
-                       
+                            availableSquares.append(square)
+                            availableSquarex.append(squarex)
+
+                for y in long1:
+                    for x in short:
+                        squarex=self.posx+x
+                        square=self.posy+y 
+                
+                        if (theboard.friendlysquare(squarex,square,self.colour))==False: 
+
+                            availableSquares.append(square)
+                            availableSquarex.append(squarex)                       
 
 
 
@@ -373,12 +404,12 @@ class Pawn(piece):
                             square=self.posy+x
                         else:
                             square=self.posy+1
-                    if (theboard.emptySquare(self.posx,square))==True and square>0:
-                    
+                    if (theboard.emptySquare(self.posx,square))==True and square>0 and square<7:
+                        if (theboard.friendlysquare(self.posx,square,self.colour))==False: 
            
-                        availableSquares.append(square)
-                        availableSquarex.append(self.posx)
-                        
+                            availableSquares.append(square)
+                            availableSquarex.append(self.posx)
+                            
                 print(availableSquares)
                     
 
@@ -391,11 +422,11 @@ class Pawn(piece):
                         if self.colour=='white':
                             
                             squarey=self.posy-1
-                            squarex=self.posx+x
+                            squarex=self.posx+x    
                             if (theboard.enemysquare("white",squarex,squarey))==True:
-                            
-                                availableSquares.append(squarey)
-                                availableSquarex.append(squarex)
+                             
+                                    availableSquares.append(squarey)
+                                    availableSquarex.append(squarex)
                             
                             
                         else:
@@ -403,7 +434,7 @@ class Pawn(piece):
                             squarex=self.posx+x
 
                             if (theboard.enemysquare("black",squarex,squarey))==True:
-                            
+                        
                                 availableSquares.append(squarey)
                                 availableSquarex.append(squarex)
                             
@@ -416,7 +447,7 @@ class Pawn(piece):
                     return SquareToMoveTo,xPerFrame,yPerFrame
          else:
             SquareToMoveTo=None,None
-            return SquareToMoveTo,xPerFrame,yPerFrame
+            return SquareToMoveTo,xPerFrame,yPerFrame 
         
 ##            else:#the pawn moves 1 most of the time
 ##                      
