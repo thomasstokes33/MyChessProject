@@ -1,4 +1,4 @@
-import re
+import re 
 string="""bpawn1.update()
 bpawn2.update()
 bpawn3.update()
@@ -35,6 +35,7 @@ wrook2.update()
 """
 k=re.compile("((b|w)([a-z]|[1-9])*)")
 g=k.findall(string)
+print(g)
 list1=[]
 for x in g:
     list1.append(x[0])
