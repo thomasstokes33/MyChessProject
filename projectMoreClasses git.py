@@ -1,4 +1,4 @@
-#1,1 = 0,0,
+ #1,1 = 0,0,
 import pprint
 import pygame
 import time
@@ -68,7 +68,7 @@ class board1():
                 else:
                     return False
         except IndexError:
-            print("empty or no enemy")
+            print("empty or no enemy fr")
              
 
 
@@ -85,7 +85,7 @@ class board1():
                 if character[0]=='b':
                     return True
         except IndexError:
-            print("empty or no enemy")
+            print("empty or no enemy en")
             return False
         
     def move(self,currentx,currenty,newx,newy):
@@ -169,7 +169,7 @@ class piece():
         print("yippee")
         return SquareToMoveTo,xPerFrame,yPerFrame
 
-    def moveit(self,thesquare,xPerFrame,yPerFrame):
+    def moveit(self,thesquare,xPerFrame,yPerFrame,turn):
         lastposx=self.posx
         lastposy=self.posy
         #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
@@ -181,17 +181,20 @@ class piece():
             clicked1=pygame.mouse.get_pressed()
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
-            update()
+            update(turn)
             #print(round(self.posx),round(self.posy))
             pygame.display.update()
             clock.tick(30)
             #print(self.posx,self.posy)
             
-            
+        
         self.posx=squarex
         self.posy=squarey
+        takenPiece=theboard.getpiece(self.posx,self.posy)
         theboard.move(lastposx,lastposy,squarex,squarey)
         self.movedyet=True
+        if takenPiece!='':
+            allPieces.remove(takenPiece)
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -389,6 +392,9 @@ class Pawn(piece):
           
                 availableSquares=[]
                 availableSquarex=[]
+                temporaryy=[]
+                temporaryx=[]
+                both_empty=True
                 for x in range(1,3):
                     
                     if self.colour=='white':
@@ -405,10 +411,24 @@ class Pawn(piece):
                         else:
                             square=self.posy+1
                     if (theboard.emptySquare(self.posx,square))==True and square>0 and square<7:
-                        if (theboard.friendlysquare(self.posx,square,self.colour))==False: 
-           
-                            availableSquares.append(square)
-                            availableSquarex.append(self.posx)
+                        if (theboard.friendlysquare(self.posx,square,self.colour))==False:
+                            
+                            temporaryy.append(square)
+                            temporaryx.append(self.posx)
+                        else:
+                            print("not empty")
+                            both_empty=False
+                    else:
+                            print("not empty")
+                            both_empty=False
+
+                if both_empty==True:
+                    print("both empty")
+                    for y in temporaryy:
+                        availableSquares.append(y)
+                    for x in temporaryx:
+                        availableSquarex.append(x)
+                            
                             
                 print(availableSquares)
                     
@@ -570,7 +590,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                     
                     currentmovingpiece=currentPiece
                     
-                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame)
+                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn)
                     if turn =='black':
                         turn='white'
                     else:
@@ -595,15 +615,22 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
         print("not returning")
         return None
      
-def update():
+def update(turn):
     #idea: when pieces are taken remove from a list which is ran through for loop.
-    allPieces=['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8', 'brook1',
-               'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2', 'wpawn1',
-               'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
-               'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']
+
     chessDisplay.blit(chessBoard,(0,0))
-    for x in allPieces:
-        eval(x).update()
+##    if turn=='black':
+    if turn=='black':
+        g=0
+        for x in range(len(allPieces)):
+            g=g-1
+            thepiece=allPieces[g]
+            eval(thepiece).update()
+    else:
+
+        for x in allPieces: 
+            eval(x).update()
+            
 ##    bpawn1.update()
 ##    bpawn2.update()
 ##    bpawn3.update()
@@ -651,7 +678,7 @@ def start(turn):
             
 
             returned,current,squ,xPerFrame,yPerFrame,turn=move(returned,current,squ,xPerFrame,yPerFrame,turn)
-            update()
+            update(turn)
             pygame.display.update()
             clock.tick(30)
             
@@ -659,6 +686,11 @@ def start(turn):
         
         
 if __name__=="__main__":
+
+    allPieces=['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8', 'brook1',
+               'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2', 'wpawn1',
+               'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
+               'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']
     theboard=board1()
     chessBoard=pygame.image.load('board4.png')
     chessDisplay.blit(chessBoard,(0,0))
