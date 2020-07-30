@@ -98,22 +98,22 @@ def isenemysquare(board,colour,x,y):
             return False
               
 
-self.posx=1
-self.posy=2
+posx=1
+posy=2
 movedtox=4
 movedtoy=5
-self.boardtemp= [['brook1', 'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2'],
+boardtemp= [['brook1', 'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2'],
             ['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8'],
             ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
             ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
             ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
-record=self.boardtemp[self.posy][self.posx]
-self.boardtemp[self.posy][self.posx]=''
-self.boardtemp[movedtoy][movedtox]=record
-if ( self.minicheck(self.boardtemp,colour,movedtox,movedtoy) ==False) :#mini check finds if new move results in king in danger. 
+record=boardtemp[posy][posx]
+boardtemp[posy][posx]=''
+boardtemp[movedtoy][movedtox]=record
+if ( minicheck(boardtemp,colour,movedtox,movedtoy) ==False) :#mini check finds if new move results in king in danger. 
     availableSquares.append(square)
-    availableSquarex.append(self.posx)
+    availableSquarex.append(posx)
 
 ##then the check algorithm which is basically the same as above
 
