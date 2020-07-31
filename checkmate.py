@@ -1,9 +1,9 @@
 
 def recursive1(board,colour,x,y,currentx,currenty):
-    if theboard.isenemysquare(board,colour,currentx+x,currenty+y)==True:
+    if isenemysquare(board,colour,currentx+x,currenty+y)==True:
         return False
     
-    elif theboard.isemptySquare(board,currentx+x,currenty+y)==False:
+    elif isemptySquare(board,currentx+x,currenty+y)==False:
         return True
         
     elif ((currentx+x>7)or(currenty+x<0))or((currenty+y>0)or(currenty+y>7)):
@@ -70,7 +70,9 @@ def minicheck(board,colour,x,y):
 
 
        
-
+def hello():
+    print("hello")
+    return "yo"
 
 
 def isemptySquare(board,x,y):
@@ -97,7 +99,7 @@ def isenemysquare(board,colour,x,y):
             print("empty")
             return False
               
-
+colour='black'
 posx=1
 posy=2
 movedtox=4
@@ -110,11 +112,33 @@ boardtemp= [['brook1', 'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'b
             ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
 record=boardtemp[posy][posx]
 boardtemp[posy][posx]=''
-boardtemp[movedtoy][movedtox]=record
-if ( minicheck(boardtemp,colour,movedtox,movedtoy) ==False) :#mini check finds if new move results in king in danger. 
+boardtemp[movedtoy][movedtox]=record  
+print(boardtemp)
+they=-1
+he=hello()
+print(he)
+
+for y in boardtemp:
+    try:
+        if colour=='white':
+            thex=y.index("wking")
+            print(thex)
+        else:
+            thex=y.index("bking")
+            print(thex)
+        they+=1
+    except ValueError:
+        print("value error")
+
+print(boardtemp[they][thex])
+        
+
+
+if (minicheck(boardtemp,colour,thex,they) ==False): #mini check finds if new move results in king in danger. 
     availableSquares.append(square)
     availableSquarex.append(posx)
-
+else: 
+    print()
 ##then the check algorithm which is basically the same as above
 
 ##then the checkmate algorithm
@@ -126,4 +150,5 @@ if ( minicheck(boardtemp,colour,movedtox,movedtoy) ==False) :#mini check finds i
 
 
 #Note: The king can't move through check. The only time this is a problem is castling and we'll worry about that 
+
 #when we get there. 
