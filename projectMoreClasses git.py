@@ -70,7 +70,7 @@ class board1():
                 else:
                     return False
         except IndexError:
-            print("empty or no enemy fr")
+            print("empty or no enemy or off board frien")
              
 
 
@@ -87,7 +87,7 @@ class board1():
                 if character[0]=='b':
                     return True
         except IndexError:
-            print("empty or no enemy en")
+            print("empty or no enemy  or off board enem")
             return False
         
     def move(self,currentx,currenty,newx,newy):
@@ -268,8 +268,6 @@ class piece():
             return True
        
     
-
-                 
      
 class King(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -335,7 +333,7 @@ class Knight(piece):
        
                 long1=[2,-2]
                 short=[1,-1]
-                
+                print("horizontal")
                 for x in long1:
                     for y in short:
                         squarex=self.posx+x
@@ -345,7 +343,7 @@ class Knight(piece):
                             #here
                             availableSquares.append(square)
                             availableSquarex.append(squarex)
-
+                print("vertical")
                 for y in long1:
                     for x in short:
                         squarex=self.posx+x
