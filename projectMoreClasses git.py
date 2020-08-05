@@ -45,7 +45,7 @@ class board1():
         return self.board[mousey][mousex]
         
     def emptySquare(self,x,y):
-        print(x,y)
+        print(x,y,"is empty square")
         if self.board[y][x] == '':
  
 
@@ -242,7 +242,7 @@ class piece():
             return False
     
 
-    def minicheck(board,colour,x,y):
+    def minicheck(self,board,colour,x,y):
         ##diagonal
         diagonal=diagonalsclear(board,colour,x,y)
 
@@ -403,11 +403,59 @@ class Bishop(piece):
             self.image=pygame.image.load('whitebishop.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
     def get_moves(self,xPerFrame,yPerFrame,turn):
+        if str(self.colour)==turn:
+            availableSquarex=[]
+            availableSquares=[]
+            for y in range(-1,2):
+                if (y==0):
+                    pass
+                else:
+                    for x in range(-1,2):
+                        if (x==0):
+                            pass
+                        
+                        else:
+                            returnvaluex=[]
+                            returnvaluey=[]
+                            returnvaluex,returnvaluey=self.recursive1(turn,x,y,self.posx,self.posy,returnvaluex,returnvaluey)
+                            print("x",returnvaluex,"y",returnvaluey)
+                            for j in returnvaluex:
+                                availableSquarex.append(j)
+                            for k in returnvaluey:
+                                 availableSquares.append(k)
+            print(availableSquarex,availableSquares)
+            if availableSquares== []:
+                SquareToMoveTo=None,None
+                return SquareToMoveTo,xPerFrame,yPerFrame
 
+            else:
+                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                return SquareToMoveTo,xPerFrame,yPerFrame
+
+
+
+        else:
             
             SquareTo=None,None
-            return SquareTo,xPerFrame,yPerFrame
-
+            return SquareTo,xPerFrame,yPerFrame               
+            
+    def recursive1(self,colour,x,y,currentx,currenty,xvalues,yvalues):
+        
+        if ((currentx+x>7)or(currentx+x<0))or((currenty+y<0)or(currenty+y>7)):#wrong position at first. this error must be checked for first
+            print("too wide")
+            return xvalues,yvalues
+        elif theboard.friendlysquare(currentx+x,currenty+y,colour)==True:
+            print("friendly")
+            return xvalues,yvalues
+        elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
+            xvalues.append(currentx+x)
+            yvalues.append(currenty+y)
+            return xvalues,yvalues            
+        else:
+            xvalues.append(currentx+x)
+            yvalues.append(currenty+y)
+            xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
+            return xvalues,yvalues
 class Pawn(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -436,6 +484,7 @@ class Pawn(piece):
                 availableSquarex=[]
                 temporaryy=[]
                 temporaryx=[]
+                closestEmpty=True
                 both_empty=True
                 for x in range(1,3):
                     
@@ -452,24 +501,35 @@ class Pawn(piece):
                             square=self.posy+x
                         else:
                             square=self.posy+1
-                    if (theboard.emptySquare(self.posx,square))==True and square>-1 and square<7:
-                        if (theboard.friendlysquare(self.posx,square,self.colour))==False:
-                             #here
-                            temporaryy.append(square)
-                            temporaryx.append(self.posx)
+                    if  square>-1 and square<8:
+                        if (theboard.emptySquare(self.posx,square))==True:
+                            if (theboard.friendlysquare( self.posx,square,self.colour))==False:
+                                #here
+                                temporaryy.append(square)
+                                temporaryx.append(self.posx)
+                            else:
+                                if x==1:
+                                    closestEmpty=False
+                                    # both_empty=False
                         else:
-                            print("not empty")
-                            both_empty=False
+                            if x==1:
+                                closestEmpty=False
                     else:
                             print("not empty")
-                            both_empty=False
-
-                if both_empty==True:
-                    print("both empty")
+                            # both_empty=False
+                            closestEmpty=False
+                if closestEmpty==True:
                     for y in temporaryy:
                         availableSquares.append(y)
                     for x in temporaryx:
                         availableSquarex.append(x)
+
+                # if both_empty==True:
+                #     print("both empty")
+                #     for y in temporaryy:
+                #         availableSquares.append(y)
+                #     for x in temporaryx:
+                #         availableSquarex.append(x)
                             
                             
                 print(availableSquares)
@@ -485,7 +545,7 @@ class Pawn(piece):
                             
                             squarey=self.posy-1
                             squarex=self.posx+x    
-                            if (theboard.enemysquare("white",squarex,squarey))==True:
+                            if (theboard.enemysquare("white",squarex,squarey))==True and squarex>-1 and square>-1:
                                     #here
                                     availableSquares.append(squarey)
                                     availableSquarex.append(squarex)
@@ -495,7 +555,7 @@ class Pawn(piece):
                             squarey=self.posy+1
                             squarex=self.posx+x
 
-                            if (theboard.enemysquare("black",squarex,squarey))==True:
+                            if (theboard.enemysquare("black",squarex,squarey))==True and squarex>-1 and square>-1:
                                 #here
                                 availableSquares.append(squarey)
                                 availableSquarex.append(squarex)
@@ -597,6 +657,7 @@ def getmouse():
             clicked=pygame.mouse.get_pressed()
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
+                  
                     pygame.quit()    
                     quit()
             
@@ -616,11 +677,11 @@ def pieceInPos(mousex,mousey):
 
 def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
  
-     
+    
     mousex,mousey,currentPiece=getmouse()
 
 
-               
+    
     
 
     if mousex!=None and mousey!=None:
