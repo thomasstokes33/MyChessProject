@@ -307,8 +307,59 @@ class Queen(piece):
 
     def get_moves(self,xPerFrame,yPerFrame,turn):
 
+        if str(self.colour)==turn:
+            availableSquarex=[]
+            availableSquares=[]
+            for y in range(-1,2):
+                if (y==0):
+                    pass
+                else:
+                    for x in range(-1,2):
+                        if (x==0):
+                            pass
+                        
+                        else:
+                            returnvaluex=[]
+                            returnvaluey=[]
+                            returnvaluex,returnvaluey=self.recursive1(turn,x,y,self.posx,self.posy,returnvaluex,returnvaluey)
+                            print("x",returnvaluex,"y",returnvaluey)
+                            for j in returnvaluex:
+                                availableSquarex.append(j)
+                            for k in returnvaluey:
+                                 availableSquares.append(k)
+            print(availableSquarex,availableSquares)
+            if availableSquares== []:
+                SquareToMoveTo=None,None
+                return SquareToMoveTo,xPerFrame,yPerFrame
+
+            else:
+                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                return SquareToMoveTo,xPerFrame,yPerFrame
+
+
+
+        else:
+            
             SquareTo=None,None
-            return SquareTo,xPerFrame,yPerFrame
+            return SquareTo,xPerFrame,yPerFrame               
+            
+    def recursive1(self,colour,x,y,currentx,currenty,xvalues,yvalues):
+        
+        if ((currentx+x>7)or(currentx+x<0))or((currenty+y<0)or(currenty+y>7)):#wrong position at first. this error must be checked for first
+            print("too wide")
+            return xvalues,yvalues
+        elif theboard.friendlysquare(currentx+x,currenty+y,colour)==True:
+            print("friendly")
+            return xvalues,yvalues
+        elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
+            xvalues.append(currentx+x)
+            yvalues.append(currenty+y)
+            return xvalues,yvalues            
+        else:
+            xvalues.append(currentx+x)
+            yvalues.append(currenty+y)
+            xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
+            return xvalues,yvalues
 
 class Knight(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -383,7 +434,61 @@ class Rook(piece):
             self.image=pygame.image.load('whiterook.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
     def get_moves(self,xPerFrame,yPerFrame,turn):
+        if str(self.colour)==turn:
+            availableSquarex=[]
+            availableSquares=[]        
+            # originalx=self.posx
+            # originaly=self.posy
+            for x in range(-1,2):
+                posx=self.posx
+                posy=self.posy
+                if x==0:
+                    pass
+                else:
 
+                    
+                        
+                        
+                        while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
+                            posx+=x 
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)
+                            
+                        if theboard.enemysquare(turn,posx+x,posy)==True:
+                            posx+=x 
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)                            
+                       
+                        
+            print("horizontal done")
+            
+            for y in range(-1,2): 
+                posx=self.posx
+                posy=self.posy
+                if x==0:
+                    pass
+                else:
+                        
+                        while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
+                            posy+=y
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)
+                        if theboard.enemysquare(turn,posx,posy+y)==True:
+                            posy+=y
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)                             
+                      
+            print("vertical done")
+            print(availableSquarex,availableSquares)
+            if availableSquares== []:
+                SquareToMoveTo=None,None
+                return SquareToMoveTo,xPerFrame,yPerFrame
+
+            else:
+                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                return SquareToMoveTo,xPerFrame,yPerFrame
+
+        else:
             SquareTo=None,None
             return SquareTo,xPerFrame,yPerFrame
 
@@ -724,7 +829,6 @@ def update(turn):
     #idea: when pieces are taken remove from a list which is ran through for loop.
 
     chessDisplay.blit(chessBoard,(0,0))
-##    if turn=='black':
     if turn=='black':
         g=0
         for x in range(len(allPieces)):
