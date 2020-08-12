@@ -285,7 +285,32 @@ class King(piece):
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
     def get_moves(self,xPerFrame,yPerFrame,turn):
+        if str(self.colour)==turn:
+                availableSquarex=[]
+                availableSquares=[]
+                posx=self.posx
+                posy=self.posy
+                for x in range(-1,2):
+                    for y in range(-1,2):
+                        if posx+x>=0 and posx+x<=7 and posy+y>=0 and posy+y<=7:
+                            if theboard.friendlysquare(posx+x,posy+y,turn)==False:
+                               availableSquares.append(posy+y)
+                               availableSquarex.append(posx+x)                                
 
+
+
+
+
+                if availableSquares== []:
+                  SquareToMoveTo=None,None
+                  return SquareToMoveTo,xPerFrame,yPerFrame
+
+                else:
+                    SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                    return SquareToMoveTo,xPerFrame,yPerFrame
+            
+        else:
+            
             SquareTo=None,None
             return SquareTo,xPerFrame,yPerFrame
 
@@ -310,6 +335,7 @@ class Queen(piece):
         if str(self.colour)==turn:
             availableSquarex=[]
             availableSquares=[]
+            #diagonals
             for y in range(-1,2):
                 if (y==0):
                     pass
@@ -328,6 +354,55 @@ class Queen(piece):
                             for k in returnvaluey:
                                  availableSquares.append(k)
             print(availableSquarex,availableSquares)
+            #straights
+            for x in range(-1,2):
+                posx=self.posx
+                posy=self.posy
+                if x==0:
+                    pass
+                else:
+
+                    
+                        
+                        
+                        while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
+                            posx+=x 
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)
+                            
+                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
+                            posx+=x 
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)                             
+                       
+                        
+            print("horizontal done")
+            print(availableSquarex,availableSquares)
+
+            for y in range(-1,2): 
+                posx=self.posx
+                posy=self.posy
+                if x==0:
+                    pass
+                else:
+                        print(y)
+                        while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
+                            posy+=y
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)
+                        if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
+                            posy+=y
+                            availableSquarex.append(posx)
+                            availableSquares.append(posy)   
+
+
+
+
+
+
+
+
+
             if availableSquares== []:
                 SquareToMoveTo=None,None
                 return SquareToMoveTo,xPerFrame,yPerFrame
@@ -409,10 +484,14 @@ class Knight(piece):
 
 
 
+                if availableSquares== []:
+                  SquareToMoveTo=None,None
+                  return SquareToMoveTo,xPerFrame,yPerFrame
 
+                else:
+                    SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
+                    return SquareToMoveTo,xPerFrame,yPerFrame
             
-                SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
-                return SquareToMoveTo,xPerFrame,yPerFrame
         else:
             
             SquareTo=None,None
@@ -454,26 +533,27 @@ class Rook(piece):
                             availableSquarex.append(posx)
                             availableSquares.append(posy)
                             
-                        if theboard.enemysquare(turn,posx+x,posy)==True:
+                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
                             posx+=x 
                             availableSquarex.append(posx)
                             availableSquares.append(posy)                            
                        
                         
             print("horizontal done")
-            
+            print(availableSquarex,availableSquares)
+
             for y in range(-1,2): 
                 posx=self.posx
                 posy=self.posy
                 if x==0:
                     pass
                 else:
-                        
+                        print(y)
                         while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
                             posy+=y
                             availableSquarex.append(posx)
                             availableSquares.append(posy)
-                        if theboard.enemysquare(turn,posx,posy+y)==True:
+                        if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
                             posy+=y
                             availableSquarex.append(posx)
                             availableSquares.append(posy)                             
