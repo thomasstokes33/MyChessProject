@@ -2,7 +2,7 @@
 import pprint
 import pygame
 import time
-import math
+import math  #imports modules
 pygame.init()
 displayWidth=600
 displayHeight=600
@@ -12,8 +12,8 @@ red=(255,0,0)
 green=(0,255,0)
 blue=(0,0,255)
 
-chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))
-pygame.display.set_caption('Chess')
+chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))#sets up display
+pygame.display.set_caption('Chess')#sets caption of window
 x=75 
 
 bottom=x*7
@@ -35,16 +35,17 @@ class board1():
                          ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
                          ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
                          ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
-    def display(self):#displays board
+                         #the array above tracks the position of every piece. 
+    def display(self):# method which displays board
         for x in range(8):
             pprint.pprint(self.board[x],compact=False,width=100)
     def currentBoard(self):
         return self.board
 
-    def getpiece(self,mousex,mousey):
+    def getpiece(self,mousex,mousey):#this fetches the piece specified by paramters
         return self.board[mousey][mousex]
         
-    def emptySquare(self,x,y):
+    def emptySquare(self,x,y):#this checks if the square specified is empty. 
         print(x,y,"is empty square")
         if self.board[y][x] == '':
  
@@ -53,8 +54,7 @@ class board1():
         else:
 
            return False
-    def friendlysquare(self,x,y,colour):
-        try:
+    def friendlysquare(self,x,y,colour):#this checks if the square contains a piece of the current players.
             
             squareInQuestion=str(self.board[y][x])
 
@@ -75,8 +75,8 @@ class board1():
 
 
         
-    def enemysquare(self,colour,x,y):
-#        pass
+    def enemysquare(self,colour,x,y):#checks if it is an enemy square
+
         try:
             character=self.board[y][x]
             if colour=="black":
@@ -90,7 +90,7 @@ class board1():
             print("empty or no enemy  or off board enem")
             return False
         
-    def move(self,currentx,currenty,newx,newy):
+    def move(self,currentx,currenty,newx,newy):#this updates the array after a piece has moved. 
         record=self.board[currenty][currentx]
         self.board[currenty][currentx]=''
         self.board[newy][newx]=record
@@ -835,7 +835,7 @@ def getmouse():
     
     mousex,mousey=None,None
     currentPiece=''
-    if clicked[0]==1:
+    if clicked[0]==1:#This gets the mouse position
         
         while clicked[0] == 1:
             random=pygame.event.get()
@@ -847,7 +847,7 @@ def getmouse():
                     quit()
             
         
-        mousex=mouse[0]//75
+        mousex=mouse[0]//75 #These 2 statements sort of act as a hashing algorithm reducing the board to 8*8 as opposed to 600*600
         mousey=mouse[1]//75
 
         currentPiece=pieceInPos(mousex,mousey)
@@ -856,7 +856,7 @@ def getmouse():
         
     return (mousex,mousey,currentPiece) 
 
-def pieceInPos(mousex,mousey):
+def pieceInPos(mousex,mousey):#This just gets the name of piece in the position the user clicked from the board array.
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
@@ -873,14 +873,16 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
         try:
 
                 print(mousex,mousey,currentPiece)
-                
-                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn)
+                #The eval statement below was to ensure it ran as python code opposed to as a string.
+                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn)#There is a different method 
+                #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
-                if SquareTo != (None,None):
+                if SquareTo != (None,None):#If there are available moves then
                     
                     currentmovingpiece=currentPiece
                     
-                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn)
+                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn)#This moves the piece to
+                    #the square the user clicked on. 
                     if turn =='black':
                         turn='white'
                     else:
@@ -906,9 +908,11 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
         return None
      
 def update(turn):
-    #idea: when pieces are taken remove from a list which is ran through for loop.
 
     chessDisplay.blit(chessBoard,(0,0))
+    #It reads from different ends of the allPieces list 
+    #so when the pieces of the player whose turn it is take other pieces they glide
+    #over them opposed to under them. 
     if turn=='black':
         g=0
         for x in range(len(allPieces)):
@@ -954,28 +958,27 @@ def update(turn):
 ##    wknight2.update()
 ##    wrook2.update()  
 
-def start(turn):
-    
+def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
     while not gameExit:
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type==pygame.QUIT: #this allows the player to quit the game
                 pygame.quit()    
                 quit()
-                #gameExit=True
+                
             
 
             returned,current,squ,xPerFrame,yPerFrame,turn=move(returned,current,squ,xPerFrame,yPerFrame,turn)
-            update(turn)
-            pygame.display.update()
+            update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
+            pygame.display.update()#This displays all change to the actual display
             clock.tick(30)
             
         
         
         
 if __name__=="__main__":
-
+    #this creates the game and classes. 
     allPieces=['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8', 'brook1',
                'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2', 'wpawn1',
                'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
@@ -988,7 +991,7 @@ if __name__=="__main__":
     print()
     list1=[]
     # Pygame pixel coordinates start in top left
-    bpawn1=Pawn("pawn",1,0,"black")#y coordinate first.
+    bpawn1=Pawn("pawn",1,0,"black")
     
     bpawn2=Pawn("pawn",1,1,"black")
     bpawn3=Pawn("pawn",1,2,"black")
