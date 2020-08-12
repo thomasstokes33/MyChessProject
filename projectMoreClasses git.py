@@ -21,7 +21,32 @@ bottom2=x*6
 top=0
 top2=x
 
+def getpiece(board,mousex,mousey):
+        return board[mousey][mousex]
 
+def isemptySquare(board,x,y):
+
+        if board[y][x] == '':
+           
+           return True
+        else:
+           
+           return False
+
+def isenemysquare(board,colour,x,y):
+        #pass
+        try:
+            character=board[y][x]
+            if colour=="black":
+                 
+                if character[0]=='w':
+                       return True  
+            else:
+                if character[0]=='b':
+                    return True
+        except IndexError:
+            print("empty")
+            return False
 
 
 
@@ -55,7 +80,7 @@ class board1():
 
            return False
     def friendlysquare(self,x,y,colour):#this checks if the square contains a piece of the current players.
-            
+        try:  
             squareInQuestion=str(self.board[y][x])
 
             
@@ -232,10 +257,24 @@ class piece():
         self.boardtemp= theboard.currentBoard()
         record=self.boardtemp[self.posy][self.posx]
         self.boardtemp[self.posy][self.posx]=''
-        self.boardtemp[movedtoy][movedtox]=record
+        self.boardtemp[movetoy][movetox]=record
         # for x in self.boardtemp:
-
-        if ( self.minicheck(self.boardtemp,colour,kingx,kingy) ==False) :#mini check finds if
+        tempY=0
+        for y in self.boardtemp:
+            try:
+                if colour=='white':
+                    thex=y.index("wking")
+                    they=tempY
+                    print(thex)
+                else:
+                    thex=y.index("bking")
+                    they=tempY
+                    print(thex)
+                tempY+=1
+            except ValueError:
+                print("value error")
+                tempY+=1
+        if ( self.minicheck(self.boardtemp,colour,thex,they) ==False) :#mini check finds if
                                                                           # new move results in king in danger. 
             # # availableSquares.append(square)
             # availableSquarex.append(self.posx)    
@@ -255,13 +294,14 @@ class piece():
         if straights==False:
             return True
 
-        # ##adjacent
-        # adjacent=adjacentclear(board,colour,x,y)
-        # if (adjacent==False):
-        #     return True
+  
         
+        ##adjacent for king and pawns
+        adjacent=adjacentclear(board,colour,x,y)
+        if (adjacent==False):
+            print("adjacents aren't clear")
+            return True          
         
-    
         ##knight
         knight=knightclear(board,colour)
         if (knight==False):
