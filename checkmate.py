@@ -179,17 +179,17 @@ def adjacentclear(board,colour,posx,posy):
      
     
 def minicheck(board,colour,x,y):
-    # #diagonal
-    # diagonal=diagonalsclear(board,colour,x,y)
+    #diagonal
+    diagonal=diagonalsclear(board,colour,x,y)
 
 
-    # if (diagonal==False):  
-    #     print("diagonal not clear")
+    if (diagonal==False):  
+        print("diagonal not clear")
         
-    #     return True
-    # print("diagonals are clear")
+        return True
+    print("diagonals are clear")
 
-    #straights
+    
     straights=straightsclear(board,colour,x,y)
     if straights==False:
         print("straights not clear")
@@ -197,21 +197,21 @@ def minicheck(board,colour,x,y):
     
     print("straights are clear")
 
-    # adjacent for king and pawns
-    # adjacent=adjacentclear(board,colour,x,y)
-    # if (adjacent==False):
-    #     print("adjacents aren't clear")
-    #     return True
+    #adjacent for king and pawns
+    adjacent=adjacentclear(board,colour,x,y)
+    if (adjacent==False):
+        print("adjacents aren't clear")
+        return True
     
     
-    # print("adjacents are clear")
-    # #knight
-    # knight=knightclear(board,colour,x,y)  # it is better this is done last as chances are less 
-    # if (knight==False):
-    #     print("knights are not clear")
-    #     return True
-    # print("knights are clear")
-    # print(x,y)
+    print("adjacents are clear")
+    #knight
+    knight=knightclear(board,colour,x,y)  # it is better this is done last as chances are less 
+    if (knight==False):
+        print("knights are not clear")
+        return True
+    print("knights are clear")
+    print(x,y)
     return False
        
     
@@ -253,12 +253,12 @@ positionx=1
 positiony=2
 movedtox=0
 movedtoy=5
-boardtemp= [['', 'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2'],
+boardtemp= [['', 'bknight1', 'bbishop1', 'bqueen', '', 'bbishop2', 'bknight2', 'brook2'],
             ['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8'],
-            ['', '', '', '', '', '', '', ''],['brook1', '', '', 'wking', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],['brook1', '', 'bking', 'wrook2', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
             ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
-            ['wrook1', 'wknight1', 'wbishop1', '', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
+            ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', '']]
 pp=pprint.PrettyPrinter(indent=1,width=100)
 record=boardtemp[positiony][positionx]
 print(record)
