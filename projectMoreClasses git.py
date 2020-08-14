@@ -254,6 +254,9 @@ class piece():
         return xPerFrame,yPerFrame
 
     def endangersKing(self,colour,movetox,movetoy):
+        print("endangersking")
+        pygame.time.wait(1000)
+        return False
         self.boardtemp= theboard.currentBoard()
         record=self.boardtemp[self.posy][self.posx]
         self.boardtemp[self.posy][self.posx]=''
@@ -330,12 +333,13 @@ class King(piece):
                 availableSquares=[]
                 posx=self.posx
                 posy=self.posy
-                for x in range(-1,2):
+                for x in range(-1,2): 
                     for y in range(-1,2):
                         if posx+x>=0 and posx+x<=7 and posy+y>=0 and posy+y<=7:
                             if theboard.friendlysquare(posx+x,posy+y,turn)==False:
-                               availableSquares.append(posy+y)
-                               availableSquarex.append(posx+x)                                
+                                if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                    availableSquares.append(posy+y)
+                                    availableSquarex.append(posx+x)                                
 
 
 
@@ -407,13 +411,15 @@ class Queen(piece):
                         
                         while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
                             posx+=x 
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)
                             
                         if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
                             posx+=x 
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)                             
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)                             
                        
                         
             print("horizontal done")
@@ -428,12 +434,14 @@ class Queen(piece):
                         print(y)
                         while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
                             posy+=y
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)
                         if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
                             posy+=y
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)   
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)   
 
 
 
@@ -467,12 +475,14 @@ class Queen(piece):
             print("friendly")
             return xvalues,yvalues
         elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
-            xvalues.append(currentx+x)
-            yvalues.append(currenty+y)
+            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+                xvalues.append(currentx+x)
+                yvalues.append(currenty+y)
             return xvalues,yvalues            
         else:
-            xvalues.append(currentx+x)
-            yvalues.append(currenty+y)
+            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+                xvalues.append(currentx+x)
+                yvalues.append(currenty+y)
             xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
             return xvalues,yvalues
 
@@ -506,9 +516,9 @@ class Knight(piece):
                         square=self.posy+y 
                 
                         if (theboard.friendlysquare(squarex,square,self.colour))==False and square>-1 : 
-                            #here
-                            availableSquares.append(square)
-                            availableSquarex.append(squarex)
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquares.append(square)
+                                availableSquarex.append(squarex)
                 print("vertical")
                 for y in long1:
                     for x in short:
@@ -516,9 +526,9 @@ class Knight(piece):
                         square=self.posy+y 
                 
                         if (theboard.friendlysquare(squarex,square,self.colour))==False and square>-1: 
-                            #here
-                            availableSquares.append(square)
-                            availableSquarex.append(squarex)                       
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquares.append(square)
+                                availableSquarex.append(squarex)                       
 
 
 
@@ -569,14 +579,16 @@ class Rook(piece):
                         
                         
                         while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
-                            posx+=x 
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)
+                            posx+=x
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king 
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)
                             
                         if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
                             posx+=x 
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)                            
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)                            
                        
                         
             print("horizontal done")
@@ -591,12 +603,14 @@ class Rook(piece):
                         print(y)
                         while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
                             posy+=y
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)
                         if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
                             posy+=y
-                            availableSquarex.append(posx)
-                            availableSquares.append(posy)                             
+                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                                availableSquarex.append(posx)
+                                availableSquares.append(posy)                             
                       
             print("vertical done")
             print(availableSquarex,availableSquares)
@@ -673,12 +687,14 @@ class Bishop(piece):
             print("friendly")
             return xvalues,yvalues
         elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
-            xvalues.append(currentx+x)
-            yvalues.append(currenty+y)
+            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                xvalues.append(currentx+x)
+                yvalues.append(currenty+y)
             return xvalues,yvalues            
         else:
-            xvalues.append(currentx+x)
-            yvalues.append(currenty+y)
+            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                xvalues.append(currentx+x)
+                yvalues.append(currenty+y)
             xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
             return xvalues,yvalues
 class Pawn(piece):
@@ -729,9 +745,9 @@ class Pawn(piece):
                     if  square>-1 and square<8:
                         if (theboard.emptySquare(self.posx,square))==True:
                             if (theboard.friendlysquare( self.posx,square,self.colour))==False:
-                                #here
-                                temporaryy.append(square)
-                                temporaryx.append(self.posx)
+                                if self.endangersKing(turn,self.posx,square)==False:#checks if the move endangers the king
+                                    temporaryy.append(square)
+                                    temporaryx.append(self.posx)
                             else:
                                 if x==1:
                                     closestEmpty=False
@@ -749,12 +765,12 @@ class Pawn(piece):
                     for x in temporaryx:
                         availableSquarex.append(x)
 
-                # if both_empty==True:
-                #     print("both empty")
-                #     for y in temporaryy:
-                #         availableSquares.append(y)
-                #     for x in temporaryx:
-                #         availableSquarex.append(x)
+                # # if both_empty==True:
+                # #     print("both empty")
+                # #     for y in temporaryy:
+                # #         availableSquares.append(y)
+                # #     for x in temporaryx:
+                # #         availableSquarex.append(x)
                             
                             
                 print(availableSquares)
@@ -771,9 +787,9 @@ class Pawn(piece):
                             squarey=self.posy-1
                             squarex=self.posx+x    
                             if (theboard.enemysquare("white",squarex,squarey))==True and squarex>-1 and square>-1:
-                                    #here
-                                    availableSquares.append(squarey)
-                                    availableSquarex.append(squarex)
+                                    if self.endangersKing(turn,squarex,squarey)==False:#checks if the move endangers the king
+                                        availableSquares.append(squarey)
+                                        availableSquarex.append(squarex)
                             
                             
                         else:
@@ -781,10 +797,10 @@ class Pawn(piece):
                             squarex=self.posx+x
 
                             if (theboard.enemysquare("black",squarex,squarey))==True and squarex>-1 and square>-1:
-                                #here
-                                availableSquares.append(squarey)
-                                availableSquarex.append(squarex)
-                            
+                                if self.endangersKing(turn,squarex,squarey)==False:#checks if the move endangers the king
+                                    availableSquares.append(squarey)
+                                    availableSquarex.append(squarex)
+                                
                 if availableSquares== []:
                     SquareToMoveTo=None,None
                     return SquareToMoveTo,xPerFrame,yPerFrame
