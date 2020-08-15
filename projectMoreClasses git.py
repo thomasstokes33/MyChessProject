@@ -45,7 +45,7 @@ def isenemysquare(board,colour,x,y):
                 if character[0]=='b':
                     return True
         except IndexError:
-            print("empty")
+            # print("empty")
             return False
 
 
@@ -79,7 +79,7 @@ class board1():
         return self.board[mousey][mousex]
         
     def emptySquare(self,x,y):#this checks if the square specified is empty. 
-        print(x,y,"is empty square")
+        # print(x,y,"is empty square")
         if self.board[y][x] == '':
  
 
@@ -103,7 +103,8 @@ class board1():
                 else:
                     return False
         except IndexError:
-            print("empty or no enemy or off board frien")
+            # print("empty or no enemy or off board frien")
+            pass
              
 
 
@@ -120,7 +121,7 @@ class board1():
                 if character[0]=='b':
                     return True
         except IndexError:
-            print("empty or no enemy  or off board enem")
+            # print("empty or no enemy  or off board enem")
             return False
         
     def move(self,currentx,currenty,newx,newy):#this updates the array after a piece has moved. 
@@ -263,23 +264,16 @@ class piece():
         return xPerFrame,yPerFrame
 
     def endangersKing(self,colour,movetox,movetoy):
-        print("endangersking")
-        #pygame.time.wait(1000)
-        
+        print("KEY",movetox,movetoy)
         board_temp= theboard.currentBoard()
-        
-        
         record=board_temp[self.posy][self.posx]
-       
-        
         board_temp[self.posy][self.posx]=''
         
        
-        return False
         board_temp[movetoy][movetox]=record
         
-        pp=pprint.PrettyPrinter(indent=1,width=100)
-        pp.pprint(board_temp)
+        # pp=pprint.PrettyPrinter(indent=1,width=100)
+        # pp.pprint(board_temp)
         tempY=0
         
         for y in board_temp:
@@ -294,9 +288,9 @@ class piece():
                     print(thex)
                 tempY+=1
             except ValueError:
-                print("value error")
+                
                 tempY+=1
-        return False       
+               
         if ( self.minicheck(board_temp,colour,thex,they) ==False) :#mini check finds if
                                                                           # new move results in king in danger. 
             # # availableSquares.append(square)
@@ -317,6 +311,7 @@ class piece():
         
         ##straights
         straights=self.straightsclear(board,colour,x,y)
+        
         if straights==False:
             print("straights are danger")
             return True
@@ -336,7 +331,7 @@ class piece():
             return True
         return False
        
-    def recursive1(self,board,colour,x,y,currentx,currenty):
+    def recursive2(self,board,colour,x,y,currentx,currenty):#the other recursive algorithm was being called
         print(currentx+x,currenty+y) 
 
         
@@ -361,7 +356,7 @@ class piece():
 
 
         else:
-            value=self.recursive1(board,colour,x,y,currentx+x,currenty+y) 
+            value=self.recursive2(board,colour,x,y,currentx+x,currenty+y) 
             if value==True:
                 return True
             else:#it wasn't true so it returned false, this was a big problem.
@@ -371,7 +366,7 @@ class piece():
     
 
 
-    def diagonalsclear(self,board,colour,posx,posy) :#tick
+    def diagonalsclear(self,board,colour,posx,posy) :
 
         for y in range(-1,2):
             if (y==0):
@@ -383,7 +378,7 @@ class piece():
                     
                     else:
                         
-                        returnvalue=self.recursive1(board,colour,x,y,posx,posy)
+                        returnvalue=self.recursive2(board,colour,x,y,posx,posy)
                         print(";")
                         if returnvalue==False:
                             return False
@@ -406,19 +401,19 @@ class piece():
             else:
 
                 if horizontalclear==True:
-                    posx+=x
                     
-                    while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and isemptySquare(board,posx,posy)==True and horizontalclear==True:
+                    
+                    while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and isemptySquare(board,posx+x,posy)==True and horizontalclear==True:
                         posx+=x
                         
-                    if isenemysquare(board,colour,posx,posy)==True:
-                        thepiece=getpiece(board,posx,posy)
+                    if isenemysquare(board,colour,posx+x,posy)==True and posx+x>0 and posx+x<8:
+                        thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             horizontalclear=False
                     else:
                         horizontalclear=True 
                     
-        print("horizontal done")
+        print("horizontal done",horizontalclear)
         
         for y in range(-1,2): 
             posx=originalx
@@ -427,23 +422,25 @@ class piece():
                 pass
             else:
                 if verticalclear==True:
-                    posy+=y
-                    while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and isemptySquare(board,posx,posy)==True and verticalclear==True:
-                        posx+=x
-                    if isenemysquare(board,colour,posx,posy)==True:
-                        thepiece=getpiece(board,posx,posy)
+                    
+                    while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and isemptySquare(board,posx,posy+y)==True and verticalclear==True:
+                        posy+=y 
+                    if isenemysquare(board,colour,posx,posy+y)==True and posy+y>0 and posy+y<8:
+                        thepiece=getpiece(board,posx,posy+y)
+                        print(thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            horizontalclear=False
+                            print(posx,posy)
+                            verticalclear=False
                     else:
                         verticalclear=True
-        print("vertical done")
+        print("vertical done",verticalclear)
         if horizontalclear==True and verticalclear==True:
             return True
         else:
             return False
 
         
-    def knightclear(self,board,colour,posx,posy): #tick
+    def knightclear(self,board,colour,posx,posy): 
 
         long1=[2,-2]
         short=[1,-1]
@@ -458,7 +455,7 @@ class piece():
                             return False
 
 
-        print("horizontal clear")
+        print("horizontal knight clear")
         for y in long1:
             for x in short:
                 if posx+x <8 and posx+x >-1 and posy+y<8 and posy+y>-1:
@@ -470,7 +467,7 @@ class piece():
                             return False
 
 
-        print( "vertical is clear")
+        print( "vertical knight is clear")
         return True
     def adjacentclear(self,board,colour,posx,posy):
         for x in range(-1,2):
@@ -610,13 +607,13 @@ class Queen(piece):
                         
                         while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
                             posx+=x 
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)
                             
-                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
+                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+x>=0:
                             posx+=x 
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)                             
                        
@@ -630,15 +627,15 @@ class Queen(piece):
                 if x==0:
                     pass
                 else:
-                        print(y)
+                        
                         while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
                             posy+=y
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)
                         if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
                             posy+=y
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)   
 
@@ -779,13 +776,13 @@ class Rook(piece):
                         
                         while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and theboard.emptySquare(posx+x,posy)==True:
                             posx+=x
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king 
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king 
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)
                             
-                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+X>=0:
+                        if theboard.enemysquare(turn,posx+x,posy)==True and posy<=7 and posy>=0 and posx+x<=7 and posx+x>=0:
                             posx+=x 
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)                            
                        
@@ -799,15 +796,15 @@ class Rook(piece):
                 if x==0:
                     pass
                 else:
-                        print(y)
+                        
                         while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and theboard.emptySquare(posx,posy+y)==True :
                             posy+=y
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)
                         if theboard.enemysquare(turn,posx,posy+y)==True and posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 :
                             posy+=y
-                            if self.endangersKing(turn,posx+x,posy+y)==False:#checks if the move endangers the king
+                            if self.endangersKing(turn,posx,posy)==False:#checks if the move endangers the king
                                 availableSquarex.append(posx)
                                 availableSquares.append(posy)                             
                       
@@ -1000,7 +997,7 @@ class Pawn(piece):
                                 if self.endangersKing(turn,squarex,squarey)==False:#checks if the move endangers the king
                                     availableSquares.append(squarey)
                                     availableSquarex.append(squarex)
-                theboard.display()
+                
                 if availableSquares== []:
                     SquareToMoveTo=None,None
                     return SquareToMoveTo,xPerFrame,yPerFrame
@@ -1127,7 +1124,10 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
 
     if mousex!=None and mousey!=None:
         try:
-
+                print()
+                print()
+                print()
+                print("NEW PIECE")
                 print(mousex,mousey,currentPiece)
                 #The eval statement below was to ensure it ran as python code opposed to as a string.
                 SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn)#There is a different method 
@@ -1147,7 +1147,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                 
                 
                 
-                theboard.display()
+                
         except SyntaxError:
                 print(mousex,mousey,"Square empty")
                 print()
