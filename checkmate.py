@@ -267,8 +267,7 @@ boardtemp[movedtoy][movedtox]=record
 pp.pprint(boardtemp)
 # pprint.pprint(boardtemp)
 tempY=0
-# he=hello()
-# print(he)
+
 
 for y in boardtemp:
     try:
