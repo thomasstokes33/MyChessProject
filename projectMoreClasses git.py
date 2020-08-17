@@ -59,7 +59,7 @@ class board1():
                          ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
                          ['', '', '', '', '', '', '', ''],['', '', '', '', '', '', '', ''],
                          ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
-                         ['wrook1', 'wknight1', 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']]
+                         ['wrook1', 'wknight1', 'wbishop1', 'wqueen', 'wking', 'wbishop2', 'wknight2', 'wrook2']]
                          #the array above tracks the position of every piece. 
     def display(self):# method which displays board
         for x in range(8):
@@ -232,6 +232,7 @@ class piece():
         self.movedyet=True
         if takenPiece!='':
             allPieces.remove(takenPiece)
+        
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -275,7 +276,7 @@ class piece():
         # pp=pprint.PrettyPrinter(indent=1,width=100)
         # pp.pprint(board_temp)
         tempY=0
-        
+        print(colour)
         for y in board_temp:
             try:
                 if colour=='white':
@@ -290,7 +291,7 @@ class piece():
             except ValueError:
                 
                 tempY+=1
-               
+        print(theboard.getpiece(thex,they))
         if ( self.minicheck(board_temp,colour,thex,they) ==False) :#mini check finds if
                                                                           # new move results in king in danger. 
             # # availableSquares.append(square)
@@ -671,12 +672,12 @@ class Queen(piece):
             print("friendly")
             return xvalues,yvalues
         elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
-            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+            if self.endangersKing(colour,currentx+x,currenty+y)==False:#checks if the move endangers the king
                 xvalues.append(currentx+x)
                 yvalues.append(currenty+y)
             return xvalues,yvalues            
         else:
-            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+            if self.endangersKing(colour,currentx+x,currenty+y)==False:#checks if the move endangers the king
                 xvalues.append(currentx+x)
                 yvalues.append(currenty+y)
             xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
@@ -883,12 +884,12 @@ class Bishop(piece):
             print("friendly")
             return xvalues,yvalues
         elif theboard.enemysquare(colour,currentx+x,currenty+y)==True:
-            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+            if self.endangersKing(colour,currentx+x,currenty+y)==False:#checks if the move endangers the king
                 xvalues.append(currentx+x)
                 yvalues.append(currenty+y)
             return xvalues,yvalues            
         else:
-            if self.endangersKing(turn,currentx+x,currenty+y)==False:#checks if the move endangers the king
+            if self.endangersKing(colour,currentx+x,currenty+y)==False:#checks if the move endangers the king
                 xvalues.append(currentx+x)
                 yvalues.append(currenty+y)
             xvalues,yvalues=self.recursive1(colour,x,y,currentx+x,currenty+y,xvalues,yvalues) 
@@ -1276,8 +1277,8 @@ if __name__=="__main__":
     wrook1=Rook("rook",7,0,"white")
     wknight1=Knight("knight",7,1,"white")
     wbishop1=Bishop("bishop",7,2,"white")
-    wking=King("king",7,3,"white")
-    wqueen=Queen("queen",7,4,"white")
+    wking=King("king",7,4,"white")
+    wqueen=Queen("queen",7,3,"white")
     wbishop2=Bishop("bishop",7,5,"white")
     wknight2=Knight("knight",7,6,"white")
     wrook2=Rook("rook",7,7,"white")
