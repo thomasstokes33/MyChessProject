@@ -180,7 +180,7 @@ class piece():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
-                    #maybe replace with return statement
+                    
         while clicked1[0]==1:
             pygame.event.get()
             clicked1=pygame.mouse.get_pressed()
@@ -188,7 +188,7 @@ class piece():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
-                    #maybe replace with return statement so I don't use quit()
+                    
         counter=0
         SquareToMoveTo=None,None
         xPerFrame,yPerFrame=None,None
@@ -218,10 +218,10 @@ class piece():
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
             update(turn)
-            #print(round(self.posx),round(self.posy))
+            
             pygame.display.update()
             clock.tick(30)
-            #print(self.posx,self.posy)
+            
             
         
         self.posx=squarex
