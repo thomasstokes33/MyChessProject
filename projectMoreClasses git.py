@@ -11,7 +11,10 @@ white=(255,255,255)
 red=(255,0,0)
 green=(0,255,0)
 blue=(0,0,255)
+movedList=open("movedList.txt","w")
+movedList.write("movedlist")
 
+movedList.close()
 chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))#sets up display
 pygame.display.set_caption('Chess')#sets caption of window
 x=75 
@@ -20,7 +23,7 @@ bottom=x*7
 bottom2=x*6
 top=0
 top2=x
-
+clock=pygame.time.Clock()
 def getpiece(board,mousex,mousey):
         return board[mousey][mousex]
 
@@ -160,6 +163,8 @@ class piece():
         self.colour=colour
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
+    def upgradePawn(self,piece):
+        pass
 
     def showSquares(self,availableSquarey,availableSquarex,xPerFrame,yPerFrame):
         counter=0
@@ -205,7 +210,7 @@ class piece():
         print("yippee")
         return SquareToMoveTo,xPerFrame,yPerFrame
 
-    def moveit(self,thesquare,xPerFrame,yPerFrame,turn):
+    def moveit(self,thesquare,xPerFrame,yPerFrame,turn,current_piece):
         lastposx=self.posx
         lastposy=self.posy
         #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
@@ -232,7 +237,20 @@ class piece():
         self.movedyet=True
         if takenPiece!='':
             allPieces.remove(takenPiece)
-        
+        if self.ptype=='pawn':
+            if self.colour=='black' and self.posy==7:
+                print("upgrade")
+                self.upgradePawn(current_piece)
+            elif self.colour=='white' and self.posy==0:
+                print("upgrade")
+                self.upgradePawn(current_piece)
+        movedList=open("movedlist.txt","a+")
+        movedList.write("\n"+current_piece)
+        movedList.close()
+
+
+
+ 
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -497,12 +515,12 @@ class piece():
                     else:
                         if colour=='black':
                             if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
-                                thepiece=getpiece(board,posx,posy+y)
-                                if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and thepiece[1]=='i'):
+                                thepiece=getpiece(board,posx+x,posy+y)
+                                if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[1]=='i'):
                                     return False                        
                         elif colour=='white':
                             if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
-                                thepiece=getpiece(board,posx,posy+y)
+                                thepiece=getpiece(board,posx+x,posy+y)
                                 if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[1]=='i'):
                                     return False
 
@@ -1082,7 +1100,7 @@ def oldcode():
 
 
 
-clock=pygame.time.Clock()
+
 def getmouse():
     mouse=pygame.mouse.get_pos()
     clicked=pygame.mouse.get_pressed()
@@ -1138,13 +1156,17 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                     
                     currentmovingpiece=currentPiece
                     
-                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn)#This moves the piece to
+                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
                     #the square the user clicked on. 
                     if turn =='black':
                         turn='white'
                     else:
                         turn='black'
-    ##          eval(currentPiece).moveit(SquareTo)
+                    boardState=open("boardstate.txt","a+")
+                    boardState.write("\n"+str(theboard.currentBoard())+turn)
+                    boardState.close()
+
+
                 
                 
                 
@@ -1218,6 +1240,10 @@ def update(turn):
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
+    boardState=open("boardstate.txt","w")
+    boardState.write("boardstate")
+    boardState.write("\n"+str(theboard.currentBoard())+turn)
+    boardState.close()
     while not gameExit:
         for event in pygame.event.get():
             if event.type==pygame.QUIT: #this allows the player to quit the game

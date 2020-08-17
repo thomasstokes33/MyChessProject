@@ -318,3 +318,4 @@ pp.pprint(boardtemp)
 #Note: The king can't move through check. The only time this is a problem is castling and we'll worry about that 
 
 #when we get there. 
+##I learnt importance of global vs local variables.
