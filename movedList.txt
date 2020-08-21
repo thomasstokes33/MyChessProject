@@ -1,0 +1,11 @@
+movedlist
+wpawn6
+bpawn5
+wpawn6
+bpawn4
+wpawn6
+bpawn5
+wpawn6
+bpawn6
+wpawn6
+bking

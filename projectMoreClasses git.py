@@ -497,7 +497,7 @@ class piece():
                     while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and isemptySquare(board,posx+x,posy)==True and horizontalclear==True:
                         posx+=x
                         
-                    if isenemysquare(board,colour,posx+x,posy)==True and posx+x>0 and posx+x<8:
+                    if isenemysquare(board,colour,posx+x,posy)==True and posx+x>-1 and posx+x<8:
                         thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             horizontalclear=False
@@ -516,7 +516,7 @@ class piece():
                     
                     while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and isemptySquare(board,posx,posy+y)==True and verticalclear==True:
                         posy+=y 
-                    if isenemysquare(board,colour,posx,posy+y)==True and posy+y>0 and posy+y<8:
+                    if isenemysquare(board,colour,posx,posy+y)==True and posy+y>-1 and posy+y<8 :
                         thepiece=getpiece(board,posx,posy+y)
                         print(thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
