@@ -163,15 +163,69 @@ class piece():
         self.colour=colour
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
-    def upgradePawn(self,piece):
-        pass
+    def upgradePawn(self,piece,colour_of_piece):
+        update(colour_of_piece)
+        if colour_of_piece=='black':
+            pygame.draw.rect(chessDisplay,white,(150,262,300,75))
+            pygame.draw.rect(chessDisplay,black,(150,262,300,75),1)
+            blackqueen=pygame.image.load("blackqueen.png")
+            blackknight=pygame.image.load("blackknight.png")
+            blackrook=pygame.image.load("blackrook.png")
+            blackbishop=pygame.image.load("blackbishop.png")
+            chessDisplay.blit(blackqueen,(150,262))
+            chessDisplay.blit(blackknight,(225,262))
+            chessDisplay.blit(blackrook,(300,262))
+            chessDisplay.blit(blackbishop,(375,262))
+        else:
+            pygame.draw.rect(chessDisplay,white,(150,262,300,75))
+            pygame.draw.rect(chessDisplay,black,(150,262,300,75),1)
+            whitequeen=pygame.image.load("whitequeen.png")
+            whiteknight=pygame.image.load("whiteknight.png")
+            whiterook=pygame.image.load("whiterook.png")
+            whitebishop=pygame.image.load("whitebishop.png")
+            chessDisplay.blit(whitequeen,(150,262))
+            chessDisplay.blit(whiteknight,(225,262))
+            chessDisplay.blit(whiterook,(300,262))
+            chessDisplay.blit(whitebishop,(375,262))
+            
+        
+        pygame.display.update()
+        clicked1=pygame.mouse.get_pressed()
+        mouse1=pygame.mouse.get_pos()
+        while clicked1[0]==0 or (mouse1[0]>450 or mouse1[0]<150 or mouse1[1]>337 or  mouse1[1]<262): 
+            pygame.event.get()
+            clicked1=pygame.mouse.get_pressed()
+            mouse1=pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type==pygame.QUIT:
+                    pygame.quit()    
+                    quit()
+        
+        if mouse1[1]>=262 and mouse1[1]<=337:
+            if mouse1[0]>=150 and mouse1[0]<=225:#queen
+                print("queen")
+                number=piece[5]
+                upgradePawn1=(self.colour[0]+'queen'+number)
 
+            if mouse1[0]>=225 and mouse1[0]<=300:#knight
+                print("knight")
+                number=piece[5]
+                upgradePawn1=(self.colour[0]+'knight'+number)
+            if mouse1[0]>=300 and mouse1[0]<=375:#rook
+                print("rook")
+                number=piece[5]
+                upgradePawn1=(self.colour[0]+'rook'+number)
+            if mouse1[0]>=375 and mouse1[0]<=450:#bishop
+                print("bishop")
+                number=piece[5]
+                upgradePawn1=(self.colour[0]+'bishop'+number)
+        print(upgradePawn1)
     def showSquares(self,availableSquarey,availableSquarex,xPerFrame,yPerFrame):
         counter=0
         for x in availableSquarey:
                 
                   
-                  pygame.draw.rect(chessDisplay,blue,[(availableSquarex[(counter)])*75,(x*75),75,75],1)
+                  pygame.draw.rect(chessDisplay,blue,((availableSquarex[(counter)])*75,(x*75),75,75),1)
                   counter+=1
                   pygame.display.update()
         
@@ -238,12 +292,12 @@ class piece():
         if takenPiece!='':
             allPieces.remove(takenPiece)
         if self.ptype=='pawn':
-            if self.colour=='black' and self.posy==7:
+            if self.colour=='black' and self.posy==2:
                 print("upgrade")
-                self.upgradePawn(current_piece)
+                self.upgradePawn(current_piece,self.colour)
             elif self.colour=='white' and self.posy==0:
                 print("upgrade")
-                self.upgradePawn(current_piece)
+                self.upgradePawn(current_piece,self.colour)
         movedList=open("movedlist.txt","a+")
         movedList.write("\n"+current_piece)
         movedList.close()
