@@ -64,6 +64,8 @@ class board1():
                          ['wpawn1', 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8'],
                          ['wrook1', 'wknight1', 'wbishop1', 'wqueen', 'wking', 'wbishop2', 'wknight2', 'wrook2']]
                          #the array above tracks the position of every piece. 
+    def newpiece(self,newpiecex,newpiecey,pieceName):
+        self.board[newpiecey][newpiecex]=pieceName
     def display(self):# method which displays board
         for x in range(8):
             pprint.pprint(self.board[x],compact=False,width=100)
@@ -206,20 +208,36 @@ class piece():
                 print("queen")
                 number=piece[5]
                 upgradePawn1=(self.colour[0]+'queen'+number)
-
+                upgradeType='queen'
+                globals()[upgradePawn1]=Queen(upgradeType.lower(),self.posy,self.posx,self.colour)
             if mouse1[0]>=225 and mouse1[0]<=300:#knight
                 print("knight")
                 number=piece[5]
                 upgradePawn1=(self.colour[0]+'knight'+number)
+                upgradeType='knight'
+                globals()[upgradePawn1]=Knight(upgradeType.lower(),self.posy,self.posx,self.colour)
             if mouse1[0]>=300 and mouse1[0]<=375:#rook
                 print("rook")
                 number=piece[5]
                 upgradePawn1=(self.colour[0]+'rook'+number)
+                upgradeType='rook'
+                globals()[upgradePawn1]=Rook(upgradeType.lower(),self.posy,self.posx,self.colour)
             if mouse1[0]>=375 and mouse1[0]<=450:#bishop
                 print("bishop")
                 number=piece[5]
                 upgradePawn1=(self.colour[0]+'bishop'+number)
-        print(upgradePawn1)
+                upgradeType='bishop'
+                globals()[upgradePawn1]=Bishop(upgradeType.lower(),self.posy,self.posx,self.colour)
+
+        allPieces.remove(piece)    
+        theboard.newpiece(self.posx,self.posy,upgradePawn1)
+        if self.colour=='black':
+            allPieces.insert(0,upgradePawn1)
+        else:
+            allPieces.insert(-1,upgradePawn1)
+
+        
+            
     def showSquares(self,availableSquarey,availableSquarex,xPerFrame,yPerFrame):
         counter=0
         for x in availableSquarey:
@@ -292,7 +310,7 @@ class piece():
         if takenPiece!='':
             allPieces.remove(takenPiece)
         if self.ptype=='pawn':
-            if self.colour=='black' and self.posy==2:
+            if self.colour=='black' and self.posy==7:
                 print("upgrade")
                 self.upgradePawn(current_piece,self.colour)
             elif self.colour=='white' and self.posy==0:
