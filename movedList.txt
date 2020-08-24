@@ -1,11 +1,8 @@
 movedlist
-wpawn6
-bpawn5
-wpawn6
+wpawn5
 bpawn4
-wpawn6
-bpawn5
-wpawn6
-bpawn6
-wpawn6
+wbishop2
+bqueen
+wbishop2
 bking
+wpawn7

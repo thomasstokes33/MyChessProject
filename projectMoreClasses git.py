@@ -209,7 +209,7 @@ class piece():
                 number=piece[5]
                 upgradePawn1=(self.colour[0]+'queen'+number)
                 upgradeType='queen'
-                globals()[upgradePawn1]=Queen(upgradeType.lower(),self.posy,self.posx,self.colour)
+                globals()[upgradePawn1]=Queen(upgradeType.lower(),self.posy,self.posx,self.colour)#don't eval whole thing
             if mouse1[0]>=225 and mouse1[0]<=300:#knight
                 print("knight")
                 number=piece[5]
@@ -644,7 +644,9 @@ class King(piece):
             
             SquareTo=None,None
             return SquareTo,xPerFrame,yPerFrame
-
+    def checkmate(self,turn):
+        #check moves of king
+        pass
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1237,7 +1239,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                     boardState=open("boardstate.txt","a+")
                     boardState.write("\n"+str(theboard.currentBoard())+turn)
                     boardState.close()
-
+                    check(turn)
 
                 
                 
@@ -1308,7 +1310,35 @@ def update(turn):
 ##    wbishop2.update()
 ##    wknight2.update()
 ##    wrook2.update()  
-
+def check(turn):
+    print("Check algorithm")
+    tempY=0
+    board=theboard.currentBoard()
+    for y in board:
+        try:
+            if turn=='white':
+                thex=y.index("wking")
+                they=tempY
+                print(thex)
+            else:
+                thex=y.index("bking")
+                they=tempY
+                print(thex)
+            tempY+=1
+        except ValueError:
+            tempY+=1
+    king_in_check=theboard.getpiece(thex,they)
+    print(king_in_check)
+    if turn=='white':
+        if wking.minicheck(board,turn,thex,they)==True:
+            print("check white")
+            wking.checkmate(turn)
+   
+    else:
+        if bking.minicheck(board,turn,thex,they)==True:
+            print("check black")
+            bking.checkmate(turn)
+        
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
@@ -1325,6 +1355,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
             
 
             returned,current,squ,xPerFrame,yPerFrame,turn=move(returned,current,squ,xPerFrame,yPerFrame,turn)
+            
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
             pygame.display.update()#This displays all change to the actual display
             clock.tick(30)
