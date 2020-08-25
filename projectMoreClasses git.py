@@ -646,7 +646,10 @@ class King(piece):
             return SquareTo,xPerFrame,yPerFrame
     def checkmate(self,turn):
         #check moves of king
-        pass
+        moves=self.get_moves()
+        if moves!=None:
+            pass
+
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
