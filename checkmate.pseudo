@@ -78,3 +78,4 @@ function minicheck(board,colour) {
 //then the checkmate algorithm
 
 // for en passant check if current piece is pawn, if last moved piece was pawn and that pawn is adjacent now.
+//On the other code I should've had the the endangers king called based on turn as a method of king only an used self.

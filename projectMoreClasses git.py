@@ -165,6 +165,8 @@ class piece():
         self.colour=colour
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
+    def coordinates(self):
+        return self.posx,self.posy
     def upgradePawn(self,piece,colour_of_piece):
         update(colour_of_piece)
         if colour_of_piece=='black':
@@ -386,7 +388,7 @@ class piece():
                                                                           # new move results in king in danger. 
             # # availableSquares.append(square)
             # availableSquarex.append(self.posx)  
-            print("no check")
+            print("no minicheck")
             
             return False
     
@@ -423,24 +425,21 @@ class piece():
         return False
        
     def recursive2(self,board,colour,x,y,currentx,currenty):#the other recursive algorithm was being called
-        print(currentx+x,currenty+y) 
-
-        
-
-        
+       
         if ((currentx+x>7)or(currentx+x<0))or((currenty+y<0)or(currenty+y>7)):#wrong position at first. this error must be checked for first
             return True
         elif isenemysquare(board,colour,currentx+x,currenty+y)==True:
             thepiece=getpiece(board,currentx+x,currenty+y)
-            print(thepiece,"")
+            
             try:
                 if thepiece[1]=='q' or thepiece[1]=='b':
-                    print(thepiece)
+                    dangerPieces.append(thepiece) 
+                    print("appending",currentx+x,currenty+y)
                     return False
                 else:
                     return True
             except:
-                print(thepiece)
+            
                 return True
         elif isemptySquare(board,currentx+x,currenty+y)==False:
             return True
@@ -470,7 +469,7 @@ class piece():
                     else:
                         
                         returnvalue=self.recursive2(board,colour,x,y,posx,posy)
-                        print(";")
+                        
                         if returnvalue==False:
                             return False
             
@@ -501,6 +500,7 @@ class piece():
                         thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             horizontalclear=False
+                            dangerPieces.append(thepiece) 
                     else:
                         horizontalclear=True 
                     
@@ -521,6 +521,7 @@ class piece():
                         print(thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             print(posx,posy)
+                            dangerPieces.append(thepiece) 
                             verticalclear=False
                     else:
                         verticalclear=True
@@ -542,7 +543,7 @@ class piece():
                         thepiece=getpiece(board,posx+x,posy+y)
                         print(thepiece)
                         if thepiece[1]=='k' and thepiece[2]=='n':
-
+                            dangerPieces.append(thepiece)
                             return False
 
 
@@ -554,7 +555,7 @@ class piece():
                         thepiece=getpiece(board,posx+x,posy+y)
                         print(thepiece)
                         if thepiece[1]=='k' and thepiece[2]=='n':
-
+                            dangerPieces.append(thepiece)
                             return False
 
 
@@ -567,7 +568,7 @@ class piece():
                         thepiece=getpiece(board,posx+x,posy)
                         
                         if thepiece[1]=='k' and thepiece[2]=='i':
-
+                            dangerPieces.append(thepiece)
                             return False
         for y in range(-1,2):
                 if posx <8 and posx >-1 and posy+y<8 and posy+y>-1:
@@ -575,7 +576,7 @@ class piece():
                         thepiece=getpiece(board,posx,posy+y)
                         
                         if thepiece[1]=='k' and thepiece[2]=='i':
-
+                            dangerPieces.append(thepiece)
                             return False      
         for y in range(-1,2):
             if (y==0):
@@ -589,11 +590,13 @@ class piece():
                             if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
                                 if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[1]=='i'):
+                                    dangerPieces.append(thepiece)
                                     return False                        
                         elif colour=='white':
                             if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
                                 if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[1]=='i'):
+                                    dangerPieces.append(thepiece)
                                     return False
 
                 
@@ -634,6 +637,7 @@ class King(piece):
 
                 if availableSquares== []:
                   SquareToMoveTo=None,None
+                  
                   return SquareToMoveTo,xPerFrame,yPerFrame
 
                 else:
@@ -646,10 +650,31 @@ class King(piece):
             return SquareTo,xPerFrame,yPerFrame
     def checkmate(self,turn):
         #check moves of king
-        moves=self.get_moves()
-        if moves!=None:
-            pass
+        for x in dangerPieces:
+            dangerPieces.remove(x)
+        print(dangerPieces)
+        temporary_board=theboard.currentBoard()
+        moves=self.get_moves(self.posx,self.posy,turn)
+        moves=moves[0]
+    
+        if moves!=(None, None):
+            return False
+        
+        theThreats=self.threats(turn,temporary_board)
+        
+    def threats(self,turn,board):
+        for x in dangerPieces:
+            posx,posy=eval(x).coordinates()
+            print(posx,posy)
+            if turn =='black':
+                tempTurn='white'
+            else:
+                tempTurn='black'
 
+            if eval(x).minicheck(board,tempTurn,posx,posy)==True:
+                print("can be taken, now I need to get the name of this piece ")
+        return True
+        
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1315,6 +1340,7 @@ def update(turn):
 ##    wrook2.update()  
 def check(turn):
     print("Check algorithm")
+    print(dangerPieces)
     tempY=0
     board=theboard.currentBoard()
     for y in board:
@@ -1332,16 +1358,21 @@ def check(turn):
             tempY+=1
     king_in_check=theboard.getpiece(thex,they)
     print(king_in_check)
+
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
             print("check white")
-            wking.checkmate(turn)
+            if wking.checkmate(turn)==True:
+                print("checkmate")
    
     else:
         if bking.minicheck(board,turn,thex,they)==True:
             print("check black")
-            bking.checkmate(turn)
-        
+            if bking.checkmate(turn)==True:
+                print("checkmate")
+
+    print("Check algorithm")
+    print(dangerPieces)
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
@@ -1350,6 +1381,9 @@ def start(turn): #this function is the main game loop and repeats over and over 
     boardState.write("\n"+str(theboard.currentBoard())+turn)
     boardState.close()
     while not gameExit:
+        for x in dangerPieces:
+            dangerPieces.remove(x)
+
         for event in pygame.event.get():
             if event.type==pygame.QUIT: #this allows the player to quit the game
                 pygame.quit()    
@@ -1378,7 +1412,7 @@ if __name__=="__main__":
     theboard.display()
     print()
     print()
-    list1=[]
+    dangerPieces=[]
     # Pygame pixel coordinates start in top left
     bpawn1=Pawn("pawn",1,0,"black")
     

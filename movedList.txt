@@ -1,12 +1,1 @@
 movedlist
-wpawn5
-bpawn4
-wpawn1
-bqueen
-wknight2
-bqueen
-wpawn7
-bqueen
-wbishop2
-bqueen
-wqueen
