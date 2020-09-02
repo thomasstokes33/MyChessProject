@@ -652,6 +652,7 @@ class King(piece):
                 
                 else:
                     if self.checkmateAlg==True:
+                        SquareToMoveTo=availableSquares
                         return SquareToMoveTo,xPerFrame,yPerFrame
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                     return SquareToMoveTo,xPerFrame,yPerFrame
