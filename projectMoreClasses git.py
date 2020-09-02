@@ -17,6 +17,8 @@ movedList.write("movedlist")
 movedList.close()
 chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))#sets up display
 pygame.display.set_caption('Chess')#sets caption of window
+icon=pygame.image.load("whitepawn.png")
+pygame.display.set_icon(icon)
 x=75 
 
 bottom=x*7
@@ -424,7 +426,7 @@ class piece():
             return True
         return False
        
-    def recursive2(self,board,colour,x,y,currentx,currenty):#the other recursive algorithm was being called
+    def recursive2(self,board,colour,x,y,currentx,currenty,tempDiagonalDangerPieces):#the other recursive algorithm was being called
        
         if ((currentx+x>7)or(currentx+x<0))or((currenty+y<0)or(currenty+y>7)):#wrong position at first. this error must be checked for first
             return True
@@ -433,8 +435,10 @@ class piece():
             
             try:
                 if thepiece[1]=='q' or thepiece[1]=='b':
+                    for o in tempDiagonalDangerPieces:
+                        dangerPieces.append(o)
                     dangerPieces.append(thepiece) 
-                    print("appending",currentx+x,currenty+y)
+                    
                     return False
                 else:
                     return True
@@ -446,11 +450,12 @@ class piece():
 
 
         else:
-            value=self.recursive2(board,colour,x,y,currentx+x,currenty+y) 
+            tempDiagonalDangerPieces.append([currentx+x,currenty+y])
+            value=self.recursive2(board,colour,x,y,currentx+x,currenty+y,tempDiagonalDangerPieces) 
             if value==True:
                 return True
             else:#it wasn't true so it returned false, this was a big problem.
-                return False
+                return False     
 
         
     
@@ -467,8 +472,8 @@ class piece():
                         pass
                     
                     else:
-                        
-                        returnvalue=self.recursive2(board,colour,x,y,posx,posy)
+                        tempDiagonalDangerPieces=[]
+                        returnvalue=self.recursive2(board,colour,x,y,posx,posy,tempDiagonalDangerPieces)
                         
                         if returnvalue==False:
                             return False
@@ -491,16 +496,17 @@ class piece():
             else:
 
                 if horizontalclear==True:
-                    
-                    
+                    tempDangerPieces=[]
                     while posx+x<=7 and posx+x>=0 and posy<=7 and posy>=0 and isemptySquare(board,posx+x,posy)==True and horizontalclear==True:
                         posx+=x
-                        
+                        tempDangerPieces.append([posx,posy])
                     if isenemysquare(board,colour,posx+x,posy)==True and posx+x>-1 and posx+x<8:
                         thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             horizontalclear=False
-                            dangerPieces.append(thepiece) 
+                            for o in tempDangerPieces:
+                                dangerPieces.append(o)
+                            dangerPieces.append(thepiece)
                     else:
                         horizontalclear=True 
                     
@@ -513,16 +519,19 @@ class piece():
                 pass
             else:
                 if verticalclear==True:
-                    
+                    tempDangerPieces=[]
                     while posy+y<=7 and posy+y>=0 and posx<=7 and posx>=0 and isemptySquare(board,posx,posy+y)==True and verticalclear==True:
                         posy+=y 
+                        tempDangerPieces.append([posx,posy])
+
                     if isenemysquare(board,colour,posx,posy+y)==True and posy+y>-1 and posy+y<8 :
                         thepiece=getpiece(board,posx,posy+y)
                         print(thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            print(posx,posy)
-                            dangerPieces.append(thepiece) 
                             verticalclear=False
+                            for o in tempDangerPieces:
+                                dangerPieces.append(o)
+                            dangerPieces.append(thepiece) 
                     else:
                         verticalclear=True
         print("vertical done",verticalclear)
@@ -611,6 +620,7 @@ class King(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackking.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -639,8 +649,10 @@ class King(piece):
                   SquareToMoveTo=None,None
                   
                   return SquareToMoveTo,xPerFrame,yPerFrame
-
+                
                 else:
+                    if self.checkmateAlg==True:
+                        return SquareToMoveTo,xPerFrame,yPerFrame
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                     return SquareToMoveTo,xPerFrame,yPerFrame
             
@@ -650,28 +662,55 @@ class King(piece):
             return SquareTo,xPerFrame,yPerFrame
     def checkmate(self,turn):
         #check moves of king
-        for x in dangerPieces:
-            dangerPieces.remove(x)
-        print(dangerPieces)
+        print("thedangerpieces",dangerPieces)
+        dangerPiecesRecord=[]
+        for items in dangerPieces:
+            if type(items)=="""<class 'list'>""":
+                minilist=[]
+                for z in items:
+                    minilist.append(z)
+                dangerPiecesRecord.append(minilist)
+            else:
+                dangerPiecesRecord.append(items)       
+
+
+
+
+        
+        
+        for x in range(len(dangerPieces)):
+            print("x",x)
+            dangerPieces.pop(0)
+            
+            #dangerPieces.remove(x)
+        self.checkmateAlg=True
+        print("dangerpieces",dangerPieces)
         temporary_board=theboard.currentBoard()
         moves=self.get_moves(self.posx,self.posy,turn)
         moves=moves[0]
-    
+        self.checkmateAlg=False
         if moves!=(None, None):
             return False
         
-        theThreats=self.threats(turn,temporary_board)
+        theThreats=self.threats(turn,temporary_board,dangerPiecesRecord)
+        if theThreats==False:
+            return False
+    def threats(self,turn,board,dangerPiecesRecord):
         
-    def threats(self,turn,board):
-        for x in dangerPieces:
-            posx,posy=eval(x).coordinates()
+        print(dangerPiecesRecord)
+        for x in dangerPiecesRecord:
+            try:
+                posx,posy=eval(x).coordinates()
+            except TypeError:
+                posx,posy=x[0],x[1]    
             print(posx,posy)
             if turn =='black':
                 tempTurn='white'
             else:
                 tempTurn='black'
 
-            if eval(x).minicheck(board,tempTurn,posx,posy)==True:
+            if eval(x).minicheck(board,tempTurn,posx,posy)==True:#Only one piece can be endangering King. The others
+                #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
                 print("can be taken, now I need to get the name of this piece ")
         return True
         
@@ -1362,6 +1401,7 @@ def check(turn):
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
             print("check white")
+            print(dangerPieces)
             if wking.checkmate(turn)==True:
                 print("checkmate")
    
@@ -1381,8 +1421,8 @@ def start(turn): #this function is the main game loop and repeats over and over 
     boardState.write("\n"+str(theboard.currentBoard())+turn)
     boardState.close()
     while not gameExit:
-        for x in dangerPieces:
-            dangerPieces.remove(x)
+        for x in range(len(dangerPieces)):
+            dangerPieces.pop(0)
 
         for event in pygame.event.get():
             if event.type==pygame.QUIT: #this allows the player to quit the game
