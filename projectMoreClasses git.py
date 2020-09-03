@@ -299,7 +299,7 @@ class piece():
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
             update(turn)
-            
+            self.update()
             pygame.display.update()
             clock.tick(30)
             
@@ -397,6 +397,7 @@ class piece():
 
     def minicheck(self,board,colour,x,y):
         #diagonal
+        print(x,y)
         diagonal=self.diagonalsclear(board,colour,x,y)
 
 
@@ -597,19 +598,27 @@ class piece():
                     if (x==0):
                         pass
                     else:
+                        print("adjacent alg")
+                        
                         if colour=='black':
-                            if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
+                            if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
+                                print(thepiece)
                                 if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[1]=='i'):
+                                    print(thepiece)
                                     dangerPieces.append(thepiece)
                                     return False                        
                         elif colour=='white':
-                            if posx +x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
+                            
+                            if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
+                                print(thepiece)
                                 if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[1]=='i'):
+                                    print(thepiece)
                                     dangerPieces.append(thepiece)
                                     return False
-
+                            else:
+                                print("Houston we have a problem")#originally We've had a problem
                 
      
      
@@ -703,6 +712,9 @@ class King(piece):
         
         
         for x in dangerPiecesRecord:
+            for u in range(len(dangerPieces)):
+                dangerPieces.pop(0)            
+
             print("dangerPieces record threats",dangerPiecesRecord)
             try:
                 posx,posy=eval(x).coordinates()
@@ -713,12 +725,13 @@ class King(piece):
                 tempTurn='white'
             else:
                 tempTurn='black'
-            print(x)
+            
             if self.minicheck(board,tempTurn,posx,posy)==True:#Only one piece can be endangering King. The others
                 #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
                 print("can be taken, now I need to get the name of this piece ")
                 return True
-        return False    
+            print(dangerPieces)
+        return False     
 
         
         
@@ -1390,6 +1403,7 @@ def check(turn):
     print(dangerPieces)
     tempY=0
     board=theboard.currentBoard()
+    
     for y in board:
         try:
             if turn=='white':
@@ -1412,17 +1426,17 @@ def check(turn):
             print(dangerPieces)
             if wking.checkmate(turn)==True:
                 print("CHECKMATE")
-                pygame.quit()    
-                quit()   
+                # pygame.quit()    
+                # quit()   
     else:
         if bking.minicheck(board,turn,thex,they)==True:
             print("check black")
             if bking.checkmate(turn)==True:
                 print("CHECKMATE")
-                pygame.quit()    
-                quit()
+                # pygame.quit()    
+                # quit()
     print("Check algorithm")
-    print(dangerPieces)
+    print(dangerPieces) 
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
