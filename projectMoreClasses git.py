@@ -513,9 +513,11 @@ class piece():
         print("horizontal done",horizontalclear)
         
         for y in range(-1,2): 
+            
             posx=originalx
             posy=originaly
-            if x==0:
+            if y==0:#was x ==0
+                
                 pass
             else:
                 if verticalclear==True:
@@ -526,7 +528,7 @@ class piece():
 
                     if isenemysquare(board,colour,posx,posy+y)==True and posy+y>-1 and posy+y<8 :
                         thepiece=getpiece(board,posx,posy+y)
-                        print(thepiece)
+                        print("thepiece",thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
                             verticalclear=False
                             for o in tempDangerPieces:
@@ -663,7 +665,7 @@ class King(piece):
             return SquareTo,xPerFrame,yPerFrame
     def checkmate(self,turn):
         #check moves of king
-        print("thedangerpieces",dangerPieces)
+        
         dangerPiecesRecord=[]
         for items in dangerPieces:
             if type(items)=="""<class 'list'>""":
@@ -672,7 +674,7 @@ class King(piece):
                     minilist.append(z)
                 dangerPiecesRecord.append(minilist)
             else:
-                dangerPiecesRecord.append(items)       
+                dangerPiecesRecord.append(items)      #creates a duplicate list 
 
 
 
@@ -685,7 +687,7 @@ class King(piece):
             
             #dangerPieces.remove(x)
         self.checkmateAlg=True
-        print("dangerpieces",dangerPieces)
+       
         temporary_board=theboard.currentBoard()
         moves=self.get_moves(self.posx,self.posy,turn)
         moves=moves[0]
@@ -696,10 +698,12 @@ class King(piece):
         theThreats=self.threats(turn,temporary_board,dangerPiecesRecord)
         if theThreats==False:
             return False
+        return True
     def threats(self,turn,board,dangerPiecesRecord):
         
-        print(dangerPiecesRecord)
+        
         for x in dangerPiecesRecord:
+            print("dangerPieces record threats",dangerPiecesRecord)
             try:
                 posx,posy=eval(x).coordinates()
             except TypeError:
@@ -709,11 +713,14 @@ class King(piece):
                 tempTurn='white'
             else:
                 tempTurn='black'
-
-            if eval(x).minicheck(board,tempTurn,posx,posy)==True:#Only one piece can be endangering King. The others
+            print(x)
+            if self.minicheck(board,tempTurn,posx,posy)==True:#Only one piece can be endangering King. The others
                 #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
                 print("can be taken, now I need to get the name of this piece ")
-        return True
+                return True
+        return False    
+
+        
         
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
@@ -1404,14 +1411,16 @@ def check(turn):
             print("check white")
             print(dangerPieces)
             if wking.checkmate(turn)==True:
-                print("checkmate")
-   
+                print("CHECKMATE")
+                pygame.quit()    
+                quit()   
     else:
         if bking.minicheck(board,turn,thex,they)==True:
             print("check black")
             if bking.checkmate(turn)==True:
-                print("checkmate")
-
+                print("CHECKMATE")
+                pygame.quit()    
+                quit()
     print("Check algorithm")
     print(dangerPieces)
 def start(turn): #this function is the main game loop and repeats over and over again.
