@@ -165,6 +165,7 @@ class piece():
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
     def coordinates(self):
@@ -475,9 +476,10 @@ class piece():
                     else:
                         tempDiagonalDangerPieces=[]
                         returnvalue=self.recursive2(board,colour,x,y,posx,posy,tempDiagonalDangerPieces)
+                        if self.checkmateAlg==False:
+                            if returnvalue==False:
+                                return False
                         
-                        if returnvalue==False:
-                            return False
             
         return True            
                             
@@ -504,10 +506,12 @@ class piece():
                     if isenemysquare(board,colour,posx+x,posy)==True and posx+x>-1 and posx+x<8:
                         thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            horizontalclear=False
+                            
                             for o in tempDangerPieces:
                                 dangerPieces.append(o)
                             dangerPieces.append(thepiece)
+                            if self.checkmateAlg ==False:
+                                horizontalclear=False        
                     else:
                         horizontalclear=True 
                     
@@ -531,10 +535,12 @@ class piece():
                         thepiece=getpiece(board,posx,posy+y)
                         print("thepiece",thepiece)
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            verticalclear=False
+                            
                             for o in tempDangerPieces:
                                 dangerPieces.append(o)
                             dangerPieces.append(thepiece) 
+                            if self.checkmateAlg ==False:
+                                verticalclear=False  
                     else:
                         verticalclear=True
         print("vertical done",verticalclear)
@@ -556,7 +562,8 @@ class piece():
                         print(thepiece)
                         if thepiece[1]=='k' and thepiece[2]=='n':
                             dangerPieces.append(thepiece)
-                            return False
+                            if self.checkmateAlg==False:
+                                return False
 
 
         print("horizontal knight clear")
@@ -568,7 +575,8 @@ class piece():
                         print(thepiece)
                         if thepiece[1]=='k' and thepiece[2]=='n':
                             dangerPieces.append(thepiece)
-                            return False
+                            if self.checkmateAlg==False:
+                                return False
 
 
         print( "vertical knight is clear")
@@ -581,7 +589,8 @@ class piece():
                         
                         if thepiece[1]=='k' and thepiece[2]=='i':
                             dangerPieces.append(thepiece)
-                            return False
+                            if self.checkmateAlg==False:
+                                return False
         for y in range(-1,2):
                 if posx <8 and posx >-1 and posy+y<8 and posy+y>-1:
                     if isenemysquare(board,colour,posx,posy+y)==True:
@@ -589,7 +598,8 @@ class piece():
                         
                         if thepiece[1]=='k' and thepiece[2]=='i':
                             dangerPieces.append(thepiece)
-                            return False      
+                            if self.checkmateAlg==False:
+                                return False      
         for y in range(-1,2):
             if (y==0):
                 pass
@@ -607,7 +617,8 @@ class piece():
                                 if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[2]=='i'):
                                
                                     dangerPieces.append(thepiece)
-                                    return False                        
+                                    if self.checkmateAlg==False:
+                                        return False                        
                         elif colour=='white':
                             
                             if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
@@ -616,8 +627,8 @@ class piece():
                                 if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[2]=='i'):
                                     
                                     dangerPieces.append(thepiece)
-                                    
-                                    return False 
+                                    if self.checkmateAlg==False:
+                                        return False 
                             else:
                                 print("Houston we have a problem")#originally We've had a problem
                 
@@ -633,6 +644,7 @@ class King(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackking.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -663,7 +675,7 @@ class King(piece):
                   return SquareToMoveTo,xPerFrame,yPerFrame
                 
                 else:
-                    if self.checkmateAlg==True:
+                    if self.checkmateMoves==True:
                         SquareToMoveTo=availableSquares
                         return SquareToMoveTo,xPerFrame,yPerFrame
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
@@ -691,17 +703,17 @@ class King(piece):
 
         
         
-        for x in range(len(dangerPieces)):
-            print("x",x)
+        for u in range(len(dangerPieces)):
+           
             dangerPieces.pop(0)
             
             #dangerPieces.remove(x)
-        self.checkmateAlg=True
+        self.checkmateMoves=True
        
         temporary_board=theboard.currentBoard()
         moves=self.get_moves(self.posx,self.posy,turn)
         moves=moves[0]
-        self.checkmateAlg=False
+        self.checkmateMoves=False
         if moves!=(None, None):
             return False
         
@@ -711,10 +723,10 @@ class King(piece):
         return True
     def threats(self,turn,board,dangerPiecesRecord):
         
-        
+        for u in range(len(dangerPieces)):
+            dangerPieces.pop(0)        
         for x in dangerPiecesRecord:
-            for u in range(len(dangerPieces)):
-                dangerPieces.pop(0)            
+            
 
             print("dangerPieces record threats",dangerPiecesRecord)
             try:
@@ -726,17 +738,21 @@ class King(piece):
                 tempTurn='white'
             else:
                 tempTurn='black'
+                
+            self.checkmateAlg=True
+            self.minicheck(board,tempTurn,posx,posy)
             self.checkmateAlg=False
-            if self.minicheck(board,tempTurn,posx,posy)==True:
-                #Only one piece can be endangering King. The others
-                #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
-                print("can be taken, now I need to get the name of this piece ")
-                for x in  dangerPieces:
-                    posx,posy=eval(x).coordinates()
-                    
-                    
-                return False
             print(dangerPieces)
+            # if self.minicheck(board,tempTurn,posx,posy)==True:
+            #     #Only one piece can be endangering King. The others
+            #     #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
+            #     print(dangerPieces)
+            #     for x in  dangerPieces:
+            #         posx,posy=eval(x).coordinates()
+                    
+                    
+            #     return False
+            # print(dangerPieces)
         return True     
 
         
@@ -750,6 +766,7 @@ class Queen(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackqueen.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -878,6 +895,7 @@ class Knight(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackknight.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -939,6 +957,7 @@ class Rook(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackrook.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -1018,6 +1037,7 @@ class Bishop(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackbishop.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -1090,6 +1110,7 @@ class Pawn(piece):
         self.moveLorR=0
         self.movedyet=False
         self.colour=colour
+        self.checkmateAlg=False
         if self.colour=='black':
             self.image=pygame.image.load("blackpawn.png")
             chessDisplay.blit(self.image,((self.posx)*75,top2))
@@ -1441,8 +1462,9 @@ def check(turn):
                 print("CHECKMATE")
                 # pygame.quit()    
                 # quit()
-    print("Check algorithm")
-    print(dangerPieces) 
+    
+    print("chk alg comp")
+    
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
