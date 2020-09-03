@@ -603,20 +603,21 @@ class piece():
                         if colour=='black':
                             if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
-                                print(thepiece)
-                                if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[1]=='i'):
-                                    print(thepiece)
+                                
+                                if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[2]=='i'):
+                               
                                     dangerPieces.append(thepiece)
                                     return False                        
                         elif colour=='white':
                             
                             if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
                                 thepiece=getpiece(board,posx+x,posy+y)
-                                print(thepiece)
-                                if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[1]=='i'):
-                                    print(thepiece)
+                                
+                                if (thepiece[1]=='p'and posy+y<posy) or (thepiece[1]=='k' and thepiece[2]=='i'):
+                                    
                                     dangerPieces.append(thepiece)
-                                    return False
+                                    
+                                    return False 
                             else:
                                 print("Houston we have a problem")#originally We've had a problem
                 
@@ -725,13 +726,18 @@ class King(piece):
                 tempTurn='white'
             else:
                 tempTurn='black'
-            
-            if self.minicheck(board,tempTurn,posx,posy)==True:#Only one piece can be endangering King. The others
+            self.checkmateAlg=False
+            if self.minicheck(board,tempTurn,posx,posy)==True:
+                #Only one piece can be endangering King. The others
                 #just block the escape of the King, this is because if the King is ever in check it would have to move out of it.
                 print("can be taken, now I need to get the name of this piece ")
-                return True
+                for x in  dangerPieces:
+                    posx,posy=eval(x).coordinates()
+                    
+                    
+                return False
             print(dangerPieces)
-        return False     
+        return True     
 
         
         
