@@ -615,7 +615,7 @@ class piece():
                                 thepiece=getpiece(board,posx+x,posy+y)
                                 
                                 if (thepiece[1]=='p'and posy+y>posy) or (thepiece[1]=='k' and  thepiece[2]=='i'):
-                               
+                                    #may need to solve pawn problem 
                                     dangerPieces.append(thepiece)
                                     if self.checkmateAlg==False:
                                         return False                        
@@ -629,8 +629,7 @@ class piece():
                                     dangerPieces.append(thepiece)
                                     if self.checkmateAlg==False:
                                         return False 
-                            else:
-                                print("Houston we have a problem")#originally We've had a problem
+        return True
                 
      
      
@@ -715,6 +714,7 @@ class King(piece):
         moves=moves[0]
         self.checkmateMoves=False
         if moves!=(None, None):
+            print("King can move")
             return False
         
         theThreats=self.threats(turn,temporary_board,dangerPiecesRecord)
@@ -753,6 +753,27 @@ class King(piece):
                     
             #     return False
             # print(dangerPieces)
+        dangerPiecesRecord=[]
+        for items in dangerPieces:
+            if type(items)=="""<class 'list'>""":
+                minilist=[]
+                for z in items:
+                    minilist.append(z)
+                dangerPiecesRecord.append(minilist)
+            else:
+                dangerPiecesRecord.append(items)      #creates a duplicate list         
+        
+        for item in dangerPiecesRecord:
+            print(item)
+            eval(item).checkmateMoves=True
+            moves=eval(item).get_moves(self.posx,self.posy,turn)
+            print(moves)
+            if  moves[0] !=(None,None):
+                print("good")
+                eval(item).checkmateMoves=False
+
+                return False
+            eval(item).checkmateMoves=False
         return True     
 
         
@@ -767,6 +788,7 @@ class Queen(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackqueen.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -856,6 +878,9 @@ class Queen(piece):
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
             else:
+                if self.checkmateMoves==True:
+                    SquareToMoveTo=availableSquares
+                    return SquareToMoveTo,xPerFrame,yPerFrame
                 SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
@@ -896,6 +921,7 @@ class Knight(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackknight.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -940,6 +966,9 @@ class Knight(piece):
                   return SquareToMoveTo,xPerFrame,yPerFrame
 
                 else:
+                    if self.checkmateMoves==True:
+                        SquareToMoveTo=availableSquares
+                        return SquareToMoveTo,xPerFrame,yPerFrame
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                     return SquareToMoveTo,xPerFrame,yPerFrame
             
@@ -958,6 +987,7 @@ class Rook(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackrook.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -1021,6 +1051,9 @@ class Rook(piece):
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
             else:
+                if self.checkmateMoves==True:
+                    SquareToMoveTo=availableSquares
+                    return SquareToMoveTo,xPerFrame,yPerFrame                
                 SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
@@ -1038,6 +1071,7 @@ class Bishop(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackbishop.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -1071,13 +1105,15 @@ class Bishop(piece):
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
             else:
+                if self.checkmateMoves==True:
+                    SquareToMoveTo=availableSquares
+                    return SquareToMoveTo,xPerFrame,yPerFrame
                 SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                 return SquareToMoveTo,xPerFrame,yPerFrame
 
 
 
         else:
-            
             SquareTo=None,None
             return SquareTo,xPerFrame,yPerFrame               
             
@@ -1111,6 +1147,7 @@ class Pawn(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackpawn.png")
             chessDisplay.blit(self.image,((self.posx)*75,top2))
@@ -1211,6 +1248,9 @@ class Pawn(piece):
                     return SquareToMoveTo,xPerFrame,yPerFrame
 
                 else:
+                    if self.checkmateMoves==True:
+                        SquareToMoveTo=availableSquares
+                        return SquareToMoveTo,xPerFrame,yPerFrame
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                     return SquareToMoveTo,xPerFrame,yPerFrame
          else:
