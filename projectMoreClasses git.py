@@ -764,7 +764,8 @@ class King(piece):
                     
             #     return False
             # print(dangerPieces)
-       
+        print("basic",dangerPieces)
+        print("record",dangerPiecesRecord)
         dangerPiecesRecord=[]
         for items in dangerPieces:
             if type(items)=="""<class 'list'>""":
