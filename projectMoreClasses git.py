@@ -850,7 +850,7 @@ class Queen(piece):
             for y in range(-1,2): 
                 posx=self.posx
                 posy=self.posy
-                if x==0:
+                if y==0:
                     pass
                 else:
                         
