@@ -166,6 +166,7 @@ class piece():
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.checkmateMoves=False
     def update(self):
         chessDisplay.blit(self.image,((self.posx)*75,self.posy*75))
     def coordinates(self):
@@ -405,27 +406,28 @@ class piece():
         if (diagonal==False):  
             print("diagonals are danger")
             return True
-        
+       
         ##straights
         straights=self.straightsclear(board,colour,x,y)
         
         if straights==False:
             print("straights are danger")
             return True
+       
 
-  
         
         ##adjacent for king and pawns
         adjacent=self.adjacentclear(board,colour,x,y)
         if (adjacent==False):
             print("adjacents aren't clear")
             return True          
-        
+       
         ##knight
         knight=self.knightclear(board,colour,x,y)
         if (knight==False):
             print("knight are danger")
             return True
+       
         return False
        
     def recursive2(self,board,colour,x,y,currentx,currenty,tempDiagonalDangerPieces):#the other recursive algorithm was being called
@@ -437,8 +439,11 @@ class piece():
             
             try:
                 if thepiece[1]=='q' or thepiece[1]=='b':
-                    for o in tempDiagonalDangerPieces:
-                        dangerPieces.append(o)
+                    
+                    if self.checkmateAlg==False:
+                        for o in tempDiagonalDangerPieces:
+
+                            dangerPieces.append(o)
                     dangerPieces.append(thepiece) 
                     
                     return False
@@ -452,6 +457,7 @@ class piece():
 
 
         else:
+            print("currentx+x,currenty+y",currentx+x,currenty+y)
             tempDiagonalDangerPieces.append([currentx+x,currenty+y])
             value=self.recursive2(board,colour,x,y,currentx+x,currenty+y,tempDiagonalDangerPieces) 
             if value==True:
@@ -464,8 +470,11 @@ class piece():
 
 
     def diagonalsclear(self,board,colour,posx,posy) :
-
+        originalx=posx
+        originaly=posy
         for y in range(-1,2):
+            posx=originalx
+            posy=originaly
             if (y==0):
                 pass
             else:
@@ -475,6 +484,7 @@ class piece():
                     
                     else:
                         tempDiagonalDangerPieces=[]
+                        print("x and y",x,y)
                         returnvalue=self.recursive2(board,colour,x,y,posx,posy,tempDiagonalDangerPieces)
                         if self.checkmateAlg==False:
                             if returnvalue==False:
@@ -506,16 +516,16 @@ class piece():
                     if isenemysquare(board,colour,posx+x,posy)==True and posx+x>-1 and posx+x<8:
                         thepiece=getpiece(board,posx+x,posy)
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            
-                            for o in tempDangerPieces:
-                                dangerPieces.append(o)
+                            if self.checkmateAlg ==False:
+                                for o in tempDangerPieces:
+                                    dangerPieces.append(o)
                             dangerPieces.append(thepiece)
                             if self.checkmateAlg ==False:
                                 horizontalclear=False        
                     else:
                         horizontalclear=True 
                     
-        print("horizontal done",horizontalclear)
+       
         
         for y in range(-1,2): 
             
@@ -533,17 +543,17 @@ class piece():
 
                     if isenemysquare(board,colour,posx,posy+y)==True and posy+y>-1 and posy+y<8 :
                         thepiece=getpiece(board,posx,posy+y)
-                        print("thepiece",thepiece)
+                      
                         if thepiece[1]=='q' or thepiece[1]=='r':
-                            
-                            for o in tempDangerPieces:
-                                dangerPieces.append(o)
+                            if self.checkmateAlg==False:
+                                for o in tempDangerPieces:
+                                    dangerPieces.append(o)
                             dangerPieces.append(thepiece) 
                             if self.checkmateAlg ==False:
                                 verticalclear=False  
                     else:
                         verticalclear=True
-        print("vertical done",verticalclear)
+      
         if horizontalclear==True and verticalclear==True:
             return True
         else:
@@ -559,27 +569,27 @@ class piece():
                 if posx+x <8 and posx+x >-1 and posy+y<8 and posy+y>-1:
                     if isenemysquare(board,colour,posx+x,posy+y )==True:
                         thepiece=getpiece(board,posx+x,posy+y)
-                        print(thepiece)
+               
                         if thepiece[1]=='k' and thepiece[2]=='n':
                             dangerPieces.append(thepiece)
                             if self.checkmateAlg==False:
                                 return False
 
 
-        print("horizontal knight clear")
+        
         for y in long1:
             for x in short:
                 if posx+x <8 and posx+x >-1 and posy+y<8 and posy+y>-1:
                     if isenemysquare(board,colour,posx+x,posy+y)==True:
                         thepiece=getpiece(board,posx+x,posy+y)
-                        print(thepiece)
+                      
                         if thepiece[1]=='k' and thepiece[2]=='n':
                             dangerPieces.append(thepiece)
                             if self.checkmateAlg==False:
                                 return False
 
 
-        print( "vertical knight is clear")
+        
         return True
     def adjacentclear(self,board,colour,posx,posy):
         for x in range(-1,2):
@@ -608,7 +618,7 @@ class piece():
                     if (x==0):
                         pass
                     else:
-                        print("adjacent alg")
+                     
                         
                         if colour=='black':
                             if posx+x<8 and posx+x>-1 and posy+y<8 and posy+y>-1 and isenemysquare(board,colour,posx+x,posy+y)==True:
@@ -740,6 +750,7 @@ class King(piece):
                 tempTurn='black'
                 
             self.checkmateAlg=True
+            print("x run",x)
             self.minicheck(board,tempTurn,posx,posy)
             self.checkmateAlg=False
             print(dangerPieces)
@@ -753,6 +764,7 @@ class King(piece):
                     
             #     return False
             # print(dangerPieces)
+       
         dangerPiecesRecord=[]
         for items in dangerPieces:
             if type(items)=="""<class 'list'>""":
@@ -1201,6 +1213,7 @@ class Pawn(piece):
                             print("not empty")
                             # both_empty=False
                             closestEmpty=False
+                print(temporaryx,temporaryy)
                 if closestEmpty==True:
                     for y in temporaryy:
                         availableSquares.append(y)
@@ -1215,7 +1228,7 @@ class Pawn(piece):
                 # #         availableSquarex.append(x)
                             
                             
-                print(availableSquares)
+                print("pawn available",availableSquares)
                     
 
               
