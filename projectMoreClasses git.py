@@ -717,10 +717,11 @@ class King(piece):
             dangerPieces.pop(0)
             
             #dangerPieces.remove(x)
-        self.checkmateMoves=True
+        self.checkmateMoves=True#This means that get_moves returns different things depending on whether it is empty.
        
         temporary_board=theboard.currentBoard()
         moves=self.get_moves(self.posx,self.posy,turn)
+        print("yo",dangerPieces)
         moves=moves[0]
         self.checkmateMoves=False
         if moves!=(None, None):
@@ -733,14 +734,16 @@ class King(piece):
         return True
     def threats(self,turn,board,dangerPiecesRecord):
         
-        for u in range(len(dangerPieces)):
+        #danger piece record is a list of pieces currently threatening king and spaces that can be blocked
+        for item in range(len(dangerPieces)):
             dangerPieces.pop(0)        
-        for x in dangerPiecesRecord:
+        for x in dangerPiecesRecord: 
             
 
             print("dangerPieces record threats",dangerPiecesRecord)
             try:
-                posx,posy=eval(x).coordinates()
+                posx,posy=eval(x).coordinates() #This line and the exception are used to get the coordinates of the pieces
+                #I got the name of the bishop because it made the error checking easier.
             except TypeError:
                 posx,posy=x[0],x[1]    
             print(posx,posy)
@@ -749,9 +752,10 @@ class King(piece):
             else:
                 tempTurn='black'
                 
-            self.checkmateAlg=True
+            self.checkmateAlg=True#This ensures only the pieces are added that can save the king opposed to the empty squares.
             print("x run",x)
-            self.minicheck(board,tempTurn,posx,posy)
+            self.minicheck(board,tempTurn,posx,posy)#This adds to the now empty dangerPieces any pieces that can block or take pieces threatening the king.
+
             self.checkmateAlg=False
             print(dangerPieces)
             # if self.minicheck(board,tempTurn,posx,posy)==True:
@@ -774,14 +778,15 @@ class King(piece):
                     minilist.append(z)
                 dangerPiecesRecord.append(minilist)
             else:
-                dangerPiecesRecord.append(items)      #creates a duplicate list         
+                dangerPiecesRecord.append(items)      #tis for loop creates a duplicate list          
         
-        for item in dangerPiecesRecord:
+        for item in dangerPiecesRecord: #The duplicate list is used so when getting moves it doesn't change the list
             print(item)
             eval(item).checkmateMoves=True
             moves=eval(item).get_moves(self.posx,self.posy,turn)
             print(moves)
-            if  moves[0] !=(None,None):
+            if  moves[0] !=(None,None):  #If none of the saviour pieces(pieces that might be able to save the king) can move
+                #it means that there is another piece threatening king so it is checkmate if no pieces can save the king.
                 print("good")
                 eval(item).checkmateMoves=False
 
