@@ -307,16 +307,16 @@ class piece():
             
             
         
-        self.posx=squarex
+        self.posx=squarex #sets posx and posy to move-to-coordinates.
         self.posy=squarey
-        takenPiece=theboard.getpiece(self.posx,self.posy)
+        takenPiece=theboard.getpiece(self.posx,self.posy) #this records the piece that will be taken, if any.
         print(takenPiece)
-        theboard.move(lastposx,lastposy,squarex,squarey)
-        self.movedyet=True
+        theboard.move(lastposx,lastposy,squarex,squarey)#this moves the piece in the board array(an attribute of the board class)
+        self.movedyet=True 
         if takenPiece!='':
-            allPieces.remove(takenPiece)
-        if self.ptype=='pawn':
-            if self.colour=='black' and self.posy==7:
+            allPieces.remove(takenPiece) #if a piece was taken it is removed from the update list.
+        if self.ptype=='pawn': #if pawn has reached backrow it is upgrade.
+            if self.colour=='black' and self.posy==7: 
                 print("upgrade")
                 self.upgradePawn(current_piece,self.colour)
             elif self.colour=='white' and self.posy==0:
@@ -1490,7 +1490,7 @@ def check(turn):
     tempY=0
     board=theboard.currentBoard()
     
-    for y in board:
+    for y in board:  #This finds the location of the king
         try:
             if turn=='white':
                 thex=y.index("wking")
