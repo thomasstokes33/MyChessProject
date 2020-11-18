@@ -13,10 +13,9 @@ white=(255,255,255)
 red=(255,0,0)
 green=(0,255,0)
 blue=(0,0,255)
-movedList=open("movedList.txt","w")
-movedList.write("movedlist")
 
-movedList.close()
+
+
 chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))#sets up display
 pygame.display.set_caption('Chess')#sets caption of window
 icon=pygame.image.load("whitepawn.png")
@@ -1254,12 +1253,26 @@ class Pawn(piece):
             SquareToMoveTo=None,None
             return SquareToMoveTo,xPerFrame,yPerFrame 
 
-
+def gameover():
+    restart=pygame.image.load('reloadimg.png')
+    chessDisplay.blit(restart,(260,260))
+    pygame.display.update()  
+    clicked=pygame.mouse.get_pressed() 
+    while clicked[0]==0:
+        clicked=pygame.mouse.get_pressed()
+        for event in pygame.event.get():
+                if event.type==pygame.QUIT:
+                    pygame.quit()    
+                    quit()
+    gameExit=True
+    return gameExit
+    
          
 
 def getmouse():
     mouse=pygame.mouse.get_pos()
     clicked=pygame.mouse.get_pressed()
+    
     
     mousex,mousey=None,None
     currentPiece=''
@@ -1289,7 +1302,8 @@ def pieceInPos(mousex,mousey):#This just gets the name of piece in the position 
     return piece
 
 def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
- 
+    gameExit=False#Once in this loop the game isn't exiting. This is also used to stop and error, where this value
+    #isn't defined
     
     mousex,mousey,currentPiece=getmouse()
 
@@ -1321,23 +1335,14 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                     boardState=open("boardstate.txt","a+")
                     boardState.write("\n"+str(theboard.currentBoard())+turn)
                     boardState.close()
-                    check(turn)
+                    gameExit=check(turn)
 
-                
-                
-                
-                
         except SyntaxError:
                 print(mousex,mousey,"Square empty")
                 print()
-
-
-
-
-
     try:
 
-        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit
     except:
         print("not returning")
         return None
@@ -1381,22 +1386,24 @@ def check(turn):
             tempY+=1
     king_in_check=theboard.getpiece(thex,they)
     print(king_in_check)
-
+    gameExit=False
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
             print("check white")
             print(dangerPieces)
             if wking.checkmate(turn)==True:
                 print("CHECKMATE")
-                   
+                gameExit=gameover()
     else:
         if bking.minicheck(board,turn,thex,they)==True:
             print("check black")
             if bking.checkmate(turn)==True:
                 print("CHECKMATE")
-                
+                gameExit=gameover()
+               
     
     print("chk alg comp")
+    return gameExit
     
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
@@ -1416,7 +1423,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
                 
             
 
-            returned,current,squ,xPerFrame,yPerFrame,turn=move(returned,current,squ,xPerFrame,yPerFrame,turn)
+            returned,current,squ,xPerFrame,yPerFrame,turn,gameExit=move(returned,current,squ,xPerFrame,yPerFrame,turn)
             
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
             pygame.display.update()#This displays all change to the actual display
@@ -1426,53 +1433,59 @@ def start(turn): #this function is the main game loop and repeats over and over 
         
         
 if __name__=="__main__":
-    #this creates the game and classes. 
-    allPieces=['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8', 'brook1',
-               'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2', 'wpawn1',
-               'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
-               'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']
-    theboard=board1()
-    chessBoard=pygame.image.load('board4.png')
-    chessDisplay.blit(chessBoard,(0,0))
-    theboard.display()
-    print()
-    print()
-    dangerPieces=[]
-    # Pygame pixel coordinates start in top left
-    bpawn1=Pawn("pawn",1,0,"black")
-    
-    bpawn2=Pawn("pawn",1,1,"black")
-    bpawn3=Pawn("pawn",1,2,"black")
-    bpawn4=Pawn("pawn",1,3,"black")
-    bpawn5=Pawn("pawn",1,4,"black")
-    bpawn6=Pawn("pawn",1,5,"black")
-    bpawn7=Pawn("pawn",1,6,"black")
-    bpawn8=Pawn("pawn",1,7,"black")
-    brook1=Rook("rook",0,0,"black")
-    bknight1=Knight("knight",0,1,"black")
-    bbishop1=Bishop("bishop",0,2,"black")
-    bqueen=Queen("queen",0,3,"black")
-    bking=King("king",0,4,"black")
-    bbishop2=Bishop("bishop",0,5,"black")
-    bknight2=Knight("knight",0,6,"black")
-    brook2=Rook("rook",0,7,"black")
-    
-    wpawn1=Pawn("pawn",6,0,"white")
-    wpawn2=Pawn("pawn",6,1,"white")
-    wpawn3=Pawn("pawn",6,2,"white")
-    wpawn4=Pawn("pawn",6,3,"white")
-    wpawn5=Pawn("pawn",6,4,"white")
-    wpawn6=Pawn("pawn",6,5,"white")
-    wpawn7=Pawn("pawn",6,6,"white")
-    wpawn8=Pawn("pawn",6,7,"white")
-    wrook1=Rook("rook",7,0,"white")
-    wknight1=Knight("knight",7,1,"white")
-    wbishop1=Bishop("bishop",7,2,"white")
-    wking=King("king",7,4,"white")
-    wqueen=Queen("queen",7,3,"white")
-    wbishop2=Bishop("bishop",7,5,"white")
-    wknight2=Knight("knight",7,6,"white")
-    wrook2=Rook("rook",7,7,"white")
-    turn='white'
+    while True: 
+        #this creates the game and classes. 
+        movedList=open("movedList.txt","w")
+        movedList.write("movedlist")
+        movedList.close()
+        allPieces=['bpawn1', 'bpawn2', 'bpawn3', 'bpawn4', 'bpawn5', 'bpawn6', 'bpawn7', 'bpawn8', 'brook1',
+                'bknight1', 'bbishop1', 'bqueen', 'bking', 'bbishop2', 'bknight2', 'brook2', 'wpawn1',
+                'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
+                'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']
+        theboard=board1()
+        chessBoard=pygame.image.load('board4.png')
+        chessDisplay.blit(chessBoard,(0,0))
+        theboard.display()
+        print()
+        print()
+        dangerPieces=[]
+        # Pygame pixel coordinates start in top left
+        bpawn1=Pawn("pawn",1,0,"black")
+        
+        bpawn2=Pawn("pawn",1,1,"black")
+        bpawn3=Pawn("pawn",1,2,"black")
+        bpawn4=Pawn("pawn",1,3,"black")
+        bpawn5=Pawn("pawn",1,4,"black")
+        bpawn6=Pawn("pawn",1,5,"black")
+        bpawn7=Pawn("pawn",1,6,"black")
+        bpawn8=Pawn("pawn",1,7,"black")
+        brook1=Rook("rook",0,0,"black")
+        bknight1=Knight("knight",0,1,"black")
+        bbishop1=Bishop("bishop",0,2,"black")
+        bqueen=Queen("queen",0,3,"black")
+        bking=King("king",0,4,"black")
+        bbishop2=Bishop("bishop",0,5,"black")
+        bknight2=Knight("knight",0,6,"black")
+        brook2=Rook("rook",0,7,"black")
+        
+        wpawn1=Pawn("pawn",6,0,"white")
+        wpawn2=Pawn("pawn",6,1,"white")
+        wpawn3=Pawn("pawn",6,2,"white")
+        wpawn4=Pawn("pawn",6,3,"white")
+        wpawn5=Pawn("pawn",6,4,"white")
+        wpawn6=Pawn("pawn",6,5,"white")
+        wpawn7=Pawn("pawn",6,6,"white")
+        wpawn8=Pawn("pawn",6,7,"white")
+        wrook1=Rook("rook",7,0,"white")
+        wknight1=Knight("knight",7,1,"white")
+        wbishop1=Bishop("bishop",7,2,"white")
+        wking=King("king",7,4,"white")
+        wqueen=Queen("queen",7,3,"white")
+        wbishop2=Bishop("bishop",7,5,"white")
+        wknight2=Knight("knight",7,6,"white")
+        wrook2=Rook("rook",7,7,"white")
+        turn='white'
 
-    start(turn)
+        start(turn)
+
+
