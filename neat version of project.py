@@ -1431,7 +1431,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
             
         
         
-        
+         
 if __name__=="__main__":
     while True: 
         #this creates the game and classes. 
