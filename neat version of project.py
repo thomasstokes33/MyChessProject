@@ -240,10 +240,26 @@ class piece():
     def showSquares(self,availableSquarey,availableSquarex,xPerFrame,yPerFrame):
         counter=0
         for item in availableSquarey:
-                  pygame.draw.rect(chessDisplay,blue,((availableSquarex[(counter)])*75,(item*75),75,75),1)
-                  #draws rectangle on chessdisplay, blue outline, (left side x coordinate, top side y coordinate, width,height), thickness
-                  counter+=1
-                  pygame.display.update()
+                try:
+                    pygame.draw.rect(chessDisplay,blue,((availableSquarex[(counter)])*75,(item*75),75,75),1)
+                except IndexError:
+                        if item[1]=='q':
+                            print(item)
+                            if item[0]=='b':
+                                they=0
+                            elif item[0]=='w':
+                                they=7
+                            pygame.draw.rect(chessDisplay,blue,(2*75,they*75,75,75),1)
+                        elif item[1]=='k':
+                            print(item)
+                            if item[0]=='b':
+                                they=0
+                            elif item[0]=='w':
+                                they=7
+                            pygame.draw.rect(chessDisplay,blue,(6*75,they*75,75,75),1)
+                #draws rectangle on chessdisplay, blue outline, (left side x coordinate, top side y coordinate, width,height), thickness
+                counter+=1
+                pygame.display.update()
         
         
         clicked1=pygame.mouse.get_pressed() #This returns a list of left mouse button,middle mouse button and left mouse button in that order.
@@ -269,11 +285,17 @@ class piece():
         SquareToMoveTo=None,None
         xPerFrame,yPerFrame=None,None
         for item in availableSquarey:
-            if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>item*75 and mouse1[1]<(item*75)+75):
-                SquareToMoveTo=availableSquarex[counter],item 
-                xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1]) #This allows the function to return 
-                #the distance the piece will move per frame as well as 
-                
+            try:
+                if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>item*75 and mouse1[1]<(item*75)+75):
+                    SquareToMoveTo=availableSquarex[counter],item 
+                    xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1]) #This allows the function to return 
+                    #the distance the piece will move per frame 
+            except IndexError:
+                if item[1]=='q':
+                     SquareToMoveTo=item
+                elif item[1]=='k':
+                    SquareToMoveTo=item
+
             counter+=1
         #If the user doesn't click in the blue boxes, None is returned for all fields.
         return SquareToMoveTo,xPerFrame,yPerFrame
@@ -315,10 +337,6 @@ class piece():
         movedList=open("movedlist.txt","a+")
         movedList.write("\n"+current_piece)
         movedList.close()
-
-
-
- 
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -678,12 +696,18 @@ class King(piece):
                     if kingside[1:5]== 'rook' and eval(kingside).movedyet==False: #checks if rook is there
                             if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
                                 if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
-                                    print("yipee")
-                                    #availableSquares.append(str(self.colour)[0]+"kingside")
-
-                    
-                                    
-                    
+                                    availableSquares.append(str(self.colour)[0]+"kingside")
+                                else:#this is printed if minicheck is true for any of the squares.
+                                    print("castling not available")
+                    #queenside
+                    queenside=(theboard.getpiece(self.posx-4,self.posy))
+                    if queenside[1:5]=='rook' and eval(queenside).movedyet==False:#if it is a rook and it has moved then it will fail this if statement.
+                        if theboard.emptySquare(self.posx-1,self.posy)==True and theboard.emptySquare(self.posx-2,self.posy)==True and theboard.emptySquare(self.posx-3,self.posy)==True:
+                            if self.minicheck(theboard.board,self.colour,self.posx-1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx-2,self.posy)==False and  self.minicheck(theboard.board,self.colour,self.posx-3,self.posy)==False:
+                                    print("yipee2")
+                                    availableSquares.append(str(self.colour)[0]+"queenside")
+                            else:#this is printed if minicheck is true for any of the squares.
+                                print("castling not available")
                 print(availableSquares,availableSquarex)
                 if availableSquares== []:#If there are no available moves the square to move to is None,None
                   #and the show squares stage(where the available moves are highlighted) is skipped.
@@ -1331,12 +1355,13 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                 print(mousex,mousey,currentPiece)
                 #The eval statement below was to ensure it ran as python code opposed to as a string.
                 SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn,check)#There is a different method 
+
+
                 #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
                 if SquareTo != (None,None):#If there are available moves then:
                     
                     currentmovingpiece=currentPiece
-                    
                     moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
                     #the square the user clicked on. 
                     if turn =='black':
@@ -1352,7 +1377,6 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                 print(mousex,mousey,"Square empty")
                 print()
     try:
-
         return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check
     except:
         print("not returning")
