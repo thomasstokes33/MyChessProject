@@ -79,3 +79,7 @@ function minicheck(board,colour) {
 
 // for en passant check if current piece is pawn, if last moved piece was pawn and that pawn is adjacent now.
 //On the other code I should've had the the endangers king called based on turn as a method of king only an used self.
+
+
+//add a way to store piece just clicked on so if clicked again it's no worries
+//some methods could've been subroutines

@@ -90,7 +90,6 @@ class board1():
     def emptySquare(self,x,y):#this checks if the square specified is empty. 
    
         if self.board[y][x] == '':
- 
 
            return True
         else:
@@ -656,7 +655,7 @@ class King(piece):
         else:
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame,turn):
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):
         if str(self.colour)==turn:
                 availableSquarex=[]
                 availableSquares=[]
@@ -672,8 +671,20 @@ class King(piece):
 
 
 
+                #castling- remember that the rook can move through danger queenside
+                if self.movedyet==False and check==False: #king can't have moved yet or be in check
+                    #kingside
+                    kingside=(theboard.getpiece(self.posx+3,self.posy))#gets piece kingside(half of board where the king starts) where rook would be at the start of a game
+                    if kingside[1:5]== 'rook' and eval(kingside).movedyet==False: #checks if rook is there
+                            if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
+                                if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
+                                    print("yipee")
+                                    #availableSquares.append(str(self.colour)[0]+"kingside")
 
-
+                    
+                                    
+                    
+                print(availableSquares,availableSquarex)
                 if availableSquares== []:#If there are no available moves the square to move to is None,None
                   #and the show squares stage(where the available moves are highlighted) is skipped.
                   SquareToMoveTo=None,None
@@ -694,7 +705,7 @@ class King(piece):
             
             SquareTo=None,None
             return SquareTo,xPerFrame,yPerFrame
-    def checkmate(self,turn):
+    def checkmate(self,turn,check):
         #It first checks the available moves of the king. 
         
         dangerPiecesRecord=[]
@@ -720,7 +731,7 @@ class King(piece):
         self.checkmateMoves=True#This means that get_moves returns different things depending on whether it is empty.
        
         temporary_board=theboard.currentBoard()
-        moves=self.get_moves(self.posx,self.posy,turn)
+        moves=self.get_moves(self.posx,self.posy,turn,check)
        
         moves=moves[0]
         self.checkmateMoves=False
@@ -728,11 +739,11 @@ class King(piece):
             print("King can move")
             return False
         
-        theThreats=self.threats(turn,temporary_board,dangerPiecesRecord)
+        theThreats=self.threats(turn,temporary_board,dangerPiecesRecord,check)
         if theThreats==False:
             return False
         return True
-    def threats(self,turn,board,dangerPiecesRecord):
+    def threats(self,turn,board,dangerPiecesRecord,check):
         
         #danger piece record is a list of pieces currently threatening king and spaces that can be blocked
         for item in range(len(dangerPieces)):
@@ -772,7 +783,7 @@ class King(piece):
         for item in dangerPiecesRecord: #The duplicate list is used so if any of the minicheck sub algorithms run it doesn't change the list.
             
             eval(item).checkmateMoves=True
-            moves=eval(item).get_moves(self.posx,self.posy,turn)
+            moves=eval(item).get_moves(self.posx,self.posy,turn,check)
             
             if  moves[0] !=(None,None):  #If none of the saviour pieces(pieces that might be able to save the king) can move
                 #it means that there is another piece threatening king so it is checkmate if no pieces can save the king.
@@ -803,7 +814,7 @@ class Queen(piece):
             self.image=pygame.image.load('whitequeen.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self,xPerFrame,yPerFrame,turn):
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):
         #The queen can move along the straights and diagonals.
         if str(self.colour)==turn:
             availableSquarex=[]
@@ -937,7 +948,7 @@ class Knight(piece):
             self.image=pygame.image.load('whiteknight.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
 
-    def get_moves(self,xPerFrame,yPerFrame,turn):
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):
         if str(self.colour)==turn:
                 availableSquarex=[]
                 availableSquares=[]
@@ -1002,7 +1013,7 @@ class Rook(piece):#Works like the straights part of the queen.
         else:
             self.image=pygame.image.load('whiterook.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame,turn):
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):
         if str(self.colour)==turn:
             availableSquarex=[]
             availableSquares=[]        
@@ -1083,7 +1094,7 @@ class Bishop(piece):#Works like the diagonals part of the queen.
         else:
             self.image=pygame.image.load('whitebishop.png')
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
-    def get_moves(self,xPerFrame,yPerFrame,turn):
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):
         if str(self.colour)==turn:
             availableSquarex=[]
             availableSquares=[]
@@ -1161,7 +1172,7 @@ class Pawn(piece):
             chessDisplay.blit(self.image,((self.posx)*75,bottom2))
 
 
-    def get_moves(self,xPerFrame,yPerFrame,turn):#pawn can move forward two on first turn and then one. It can take pieces diagonally
+    def get_moves(self,xPerFrame,yPerFrame,turn,check):#pawn can move forward two on first turn and then one. It can take pieces diagonally
         #in front of it
          if str(self.colour)==turn: #This checks that the clicked piece belongs to the player whose turn it is.
           
@@ -1301,7 +1312,7 @@ def pieceInPos(mousex,mousey):#This just gets the name of piece in the position 
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
-def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
+def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
     gameExit=False#Once in this loop the game isn't exiting. This is also used to stop and error, where this value
     #isn't defined
     
@@ -1319,7 +1330,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                 print("NEW PIECE")
                 print(mousex,mousey,currentPiece)
                 #The eval statement below was to ensure it ran as python code opposed to as a string.
-                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn)#There is a different method 
+                SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn,check)#There is a different method 
                 #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
                 if SquareTo != (None,None):#If there are available moves then:
@@ -1335,14 +1346,14 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn):
                     boardState=open("boardstate.txt","a+")
                     boardState.write("\n"+str(theboard.currentBoard())+turn)
                     boardState.close()
-                    gameExit=check(turn)
+                    gameExit,check=checkAlg(turn,check)
 
         except SyntaxError:
                 print(mousex,mousey,"Square empty")
                 print()
     try:
 
-        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check
     except:
         print("not returning")
         return None
@@ -1365,7 +1376,7 @@ def update(turn):
             eval(x).update()
             
 
-def check(turn):
+def checkAlg(turn,check):
     print("Check algorithm")
     print(dangerPieces)
     tempY=0
@@ -1390,24 +1401,26 @@ def check(turn):
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
             print("check white")
+            check=True
             print(dangerPieces)
-            if wking.checkmate(turn)==True:
+            if wking.checkmate(turn,check)==True:
                 print("CHECKMATE")
                 gameExit=gameover()
     else:
         if bking.minicheck(board,turn,thex,they)==True:
             print("check black")
-            if bking.checkmate(turn)==True:
+            check=True
+            if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
                 gameExit=gameover()
                
     
     print("chk alg comp")
-    return gameExit
+    return gameExit,check
     
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
-    returned,current,squ,xPerFrame,yPerFrame=None,None,None,None,None
+    returned,current,squ,xPerFrame,yPerFrame,check=None,None,None,None,None,False
     boardState=open("boardstate.txt","w")
     boardState.write("boardstate")
     boardState.write("\n"+str(theboard.currentBoard())+turn)
@@ -1423,7 +1436,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
                 
             
 
-            returned,current,squ,xPerFrame,yPerFrame,turn,gameExit=move(returned,current,squ,xPerFrame,yPerFrame,turn)
+            returned,current,squ,xPerFrame,yPerFrame,turn,gameExit,check=move(returned,current,squ,xPerFrame,yPerFrame,turn,check)
             
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
             pygame.display.update()#This displays all change to the actual display
