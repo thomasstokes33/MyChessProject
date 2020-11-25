@@ -7,7 +7,7 @@ import time
 import math  #imports modules
 pygame.init()
 displayWidth=600
-displayHeight=600
+displayHeight=610
 black=(0,0,0)
 white=(255,255,255)
 red=(255,0,0)
@@ -306,16 +306,27 @@ class piece():
         #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
         squarex=thesquare[0]
         squarey=thesquare[1]
+        print(thesquare)
         print("moveit","x",squarex,"y",squarey,xPerFrame)
-    
+        slowatend=1
         while round(self.posx,1)!=squarex or round(self.posy,1)!=squarey:
-            clicked1=pygame.mouse.get_pressed()
+
+            clicked1=pygame.mouse.get_pressed()#If the pygame window isn't receiving an instruction it becomes unresponsive.
             self.posx=self.posx+(xPerFrame/75)
             self.posy=self.posy+(yPerFrame/75)
             update(turn)
             self.update()
             pygame.display.update()
-            clock.tick(30)
+            hor=self.posx-squarex
+            vert=self.posy-squarey
+            distanceleft=math.sqrt((abs(hor))**2+(abs(vert))**2)
+            if distanceleft<2:
+                if slowatend<12:
+                    slowatend=slowatend+0.5
+                clock.tick(30-slowatend)
+            else:
+                clock.tick(30)
+            
             
             
         
@@ -459,7 +470,7 @@ class piece():
                 return True
         elif isemptySquare(board,currentx+x,currenty+y)==False:
             return True
-#This function basically scans out from the king stopping if the next square is filled or the edge of the board is reached. If the piece is an enemy piece then there is a threat along the diagonals.
+        #This function basically scans out from the king stopping if the next square is filled or the edge of the board is reached. If the piece is an enemy piece then there is a threat along the diagonals.
 
         else:
            
@@ -694,21 +705,23 @@ class King(piece):
                     #kingside
                     kingside=(theboard.getpiece(self.posx+3,self.posy))#gets piece kingside(half of board where the king starts) where rook would be at the start of a game
                     if kingside[1:5]== 'rook' and eval(kingside).movedyet==False: #checks if rook is there
-                            if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
-                                if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
-                                    availableSquares.append(str(self.colour)[0]+"kingside")
-                                else:#this is printed if minicheck is true for any of the squares.
-                                    print("castling not available")
+                        if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
+                            if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
+                                availableSquares.append(str(self.colour)[0]+"kingside")
+                            else:#this is printed if minicheck is true for any of the squares.
+                                print("castling not available")
                     #queenside
                     queenside=(theboard.getpiece(self.posx-4,self.posy))
                     if queenside[1:5]=='rook' and eval(queenside).movedyet==False:#if it is a rook and it has moved then it will fail this if statement.
                         if theboard.emptySquare(self.posx-1,self.posy)==True and theboard.emptySquare(self.posx-2,self.posy)==True and theboard.emptySquare(self.posx-3,self.posy)==True:
                             if self.minicheck(theboard.board,self.colour,self.posx-1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx-2,self.posy)==False and  self.minicheck(theboard.board,self.colour,self.posx-3,self.posy)==False:
-                                    print("yipee2")
+                                    
                                     availableSquares.append(str(self.colour)[0]+"queenside")
                             else:#this is printed if minicheck is true for any of the squares.
                                 print("castling not available")
-                print(availableSquares,availableSquarex)
+               
+
+
                 if availableSquares== []:#If there are no available moves the square to move to is None,None
                   #and the show squares stage(where the available moves are highlighted) is skipped.
                   SquareToMoveTo=None,None
@@ -817,12 +830,93 @@ class King(piece):
                 return False
             eval(item).checkmateMoves=False
         return True     
+    def distancePerFrameRook(self,movetox,movetoy,currentx,currenty):
+        movetox=movetox*75  
+        movetoy=movetoy*75
+        currentx=currentx*75
+        currenty=currenty*75
+        hor=abs(currentx-movetox)
+        vert=abs(currenty-movetoy)    
+        distance=math.sqrt((abs(hor))**2+(abs(vert))**2)    
+        speed=210
+        time=distance/speed
+        framestaken=round((time/1)*30)
+        xPerFrame=(hor/framestaken)
+        yPerFrame=(vert/framestaken) 
+        if movetox<currentx:
+            xPerFrame=-xPerFrame
+
+        if movetoy<currenty:
+            yPerFrame=-yPerFrame
+                    
+        return xPerFrame,yPerFrame
     def queensidecastle(self,currentTurn):
-        print("queensidecastle")
+        lastposx=self.posx
+        lastposy=self.posy 
+        movetox=self.posx-2
+        movetoy=self.posy
+        rookCurrentx=0
+        rookNewx=3
+        if currentTurn=='black':
+            rookCurrenty=0
+            rookNewy=0   
+        else:
+            rookCurrenty=7
+            rookNewy=7#
+        rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
+        rook_x_per_frame=eval(rookname).distancePerFrame(rookCurrentx,rookNewx) 
+        rook_y_per_frame=1
+        king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)
+    
+        while round(self.posx,1)!=movetox or round(self.posy,1)!=movetox:
+            clicked1=pygame.mouse.get_pressed()
+            if round(self.posx,1)!=movetox or round(self.posy,1)!=movetox:
+                self.posx=self.posx+(xPerFrame/75)
+                self.posy=self.posy+(yPerFrame/75)
+            update(turn)
+            self.update()
+            pygame.display.update()
+            clock.tick(30)
+        
+
+        self.posx=movetox
+        self.posy=movetoy
+        eval(rookname).posx=rookNewx
+        eval(rookname).posy=rookNewy
+        theboard.move(lastposx,lastposy,movetox,movetoy)#
+        theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)#
+        movedList=open("movedlist.txt","a+")#
+        movedList.write("\n"+'castlequeenside')#
+        movedList.close()#        
+
     def kingsidecastle(self,currentTurn):
-        print("kingsidecastle")
-        
-        
+        lastposx=self.posx
+        lastposy=self.posy
+        movetox=self.posx+2
+        movetoy=self.posy
+        rookCurrentx=7
+        rookNewx=5
+        if currentTurn=='black':
+            rookCurrenty=0
+            rookNewy=0   
+        else:
+            rookCurrenty=7
+            rookNewy=7    #
+
+        while round(self.posx,1)!=squarex or round(self.posy,1)!=squarey:
+            clicked1=pygame.mouse.get_pressed()
+            self.posx=self.posx+(xPerFrame/75)
+            self.posy=self.posy+(yPerFrame/75)
+            update(turn)
+            self.update()
+            pygame.display.update()
+            clock.tick(30)
+
+        theboard.move(lastposx,lastposy,movetox,movetoy)#
+        theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)#
+        movedList=open("movedlist.txt","a+")#
+        movedList.write("\n"+'castlekingside')#
+        movedList.close()#
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1328,8 +1422,8 @@ def getmouse():
         
         mousex=mouse[0]//75 #These 2 statements sort of act as a hashing algorithm reducing the board to 8*8 as opposed to 600*600
         mousey=mouse[1]//75
-
-        currentPiece=pieceInPos(mousex,mousey)
+        if mousey<=7:
+            currentPiece=pieceInPos(mousex,mousey)
         
         
         
@@ -1513,7 +1607,7 @@ if __name__=="__main__":
         bknight2=Knight("knight",0,6,"black")
         brook2=Rook("rook",0,7,"black")
         
-        wpawn1=Pawn("pawn",6,0,"white")
+        wpawn1=Pawn("pawn",6,0,"white")#y coordinate first here only
         wpawn2=Pawn("pawn",6,1,"white")
         wpawn3=Pawn("pawn",6,2,"white")
         wpawn4=Pawn("pawn",6,3,"white")

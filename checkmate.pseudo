@@ -85,3 +85,14 @@ function minicheck(board,colour) {
 //some methods could've been subroutines
 
 //make attribute variables private, so variable usage can be accurately traced
+
+
+
+
+
+//I've added game over and castling(fingers crossed). make sure to remove excess hashtags or slashes and print
+//statements
+//the castling gets a bit messy in terms of eval and accessing attributes without using a function.
+//around line 697 and of course... 854! 
+//there were a couple of functions that had to be copied, so further forward thinking could've been used to avoid
+//the problems
