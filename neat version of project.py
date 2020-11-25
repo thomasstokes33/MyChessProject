@@ -817,7 +817,10 @@ class King(piece):
                 return False
             eval(item).checkmateMoves=False
         return True     
-
+    def queensidecastle(self,currentTurn):
+        print("queensidecastle")
+    def kingsidecastle(self,currentTurn):
+        print("kingsidecastle")
         
         
 class Queen(piece):
@@ -1359,11 +1362,16 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
 
                 #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
-                if SquareTo != (None,None):#If there are available moves then:
-                    
+                if SquareTo != (None,None):#If there are available moves then:                   
                     currentmovingpiece=currentPiece
-                    moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
-                    #the square the user clicked on. 
+                    try:
+                        moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
+                        #the square the user clicked on. 
+                    except TypeError:
+                        if SquareTo[1]=='q':
+                            eval(currentmovingpiece).queensidecastle(turn)
+                        if SquareTo[1]=='k':
+                            eval(currentmovingpiece).kingsidecastle(turn)
                     if turn =='black':
                         turn='white'
                     else:
