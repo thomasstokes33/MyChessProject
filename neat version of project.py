@@ -308,7 +308,6 @@ class piece():
         squarey=thesquare[1]
         print(thesquare)
         print("moveit","x",squarex,"y",squarey,xPerFrame)
-        slowatend=1
         while round(self.posx,1)!=squarex or round(self.posy,1)!=squarey:
 
             clicked1=pygame.mouse.get_pressed()#If the pygame window isn't receiving an instruction it becomes unresponsive.
@@ -320,14 +319,11 @@ class piece():
             hor=self.posx-squarex
             vert=self.posy-squarey
             distanceleft=math.sqrt((abs(hor))**2+(abs(vert))**2)
-            if distanceleft<2:
-                if slowatend<12:
-                    slowatend=slowatend+0.5
-                clock.tick(30-slowatend)
-            else:
-                clock.tick(30)
+            if distanceleft<3:
+                xPerFrame-=(0.01*(xPerFrame))
+                yPerFrame-=(0.01*(yPerFrame))
             
-            
+            clock.tick(30)
             
         
         self.posx=squarex #sets posx and posy to move-to-coordinates.
