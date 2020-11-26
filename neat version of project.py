@@ -322,7 +322,6 @@ class piece():
             if distanceleft<3:
                 xPerFrame-=(0.01*(xPerFrame))
                 yPerFrame-=(0.01*(yPerFrame))
-            
             clock.tick(30)
             
         
@@ -847,8 +846,6 @@ class King(piece):
                     
         return xPerFrame,yPerFrame
     def queensidecastle(self,currentTurn):
-        lastposx=self.posx
-        lastposy=self.posy 
         movetox=self.posx-2
         movetoy=self.posy
         rookCurrentx=0
@@ -859,35 +856,34 @@ class King(piece):
         else:
             rookCurrenty=7
             rookNewy=7#
-        rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
-        rook_x_per_frame=eval(rookname).distancePerFrame(rookCurrentx,rookNewx) 
-        rook_y_per_frame=1
-        king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)
+        # rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
+        # rook_x_per_frame,rook_y_per_frame=self.distancePerFrameRook(rookNewx,rookNewy,rookCurrentx,rookCurrenty)
+        # king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)
     
-        while round(self.posx,1)!=movetox or round(self.posy,1)!=movetox:
-            clicked1=pygame.mouse.get_pressed()
-            if round(self.posx,1)!=movetox or round(self.posy,1)!=movetox:
-                self.posx=self.posx+(xPerFrame/75)
-                self.posy=self.posy+(yPerFrame/75)
-            update(turn)
-            self.update()
-            pygame.display.update()
-            clock.tick(30)
+        # while round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy or round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
+        #     clicked1=pygame.mouse.get_pressed()
+        #     if round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy:
+        #         self.posx=self.posx+(king_x_per_frame/75)
+        #         self.posy=self.posy+(kiny_y_per_frame/75)
+        #     if round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
+        #         eval(rookname).posx=eval(rookname).posx+(rook_x_per_frame/75)
+        #         eval(rookname).posy=eval(rookname).posy+(rook_y_per_frame/75)
+        #     update(turn)
+        #     self.update()
+        #     pygame.display.update()
+        #     clock.tick(30)
         
 
-        self.posx=movetox
-        self.posy=movetoy
-        eval(rookname).posx=rookNewx
-        eval(rookname).posy=rookNewy
-        theboard.move(lastposx,lastposy,movetox,movetoy)#
-        theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)#
+        # self.posx=movetox
+        # self.posy=movetoy
+        # eval(rookname).posx=rookNewx
+        # eval(rookname).posy=rookNewy
+        self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)
         movedList=open("movedlist.txt","a+")#
         movedList.write("\n"+'castlequeenside')#
         movedList.close()#        
 
     def kingsidecastle(self,currentTurn):
-        lastposx=self.posx
-        lastposy=self.posy
         movetox=self.posx+2
         movetoy=self.posy
         rookCurrentx=7
@@ -899,20 +895,39 @@ class King(piece):
             rookCurrenty=7
             rookNewy=7    #
 
-        while round(self.posx,1)!=squarex or round(self.posy,1)!=squarey:
+        self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)
+        movedList=open("movedlist.txt","a+")#
+        movedList.write("\n"+'castlekingside')#
+        movedList.close()#
+
+    def executeCastle(self,movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy): #this method reduces repeated code
+        rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
+        rook_x_per_frame,rook_y_per_frame=self.distancePerFrameRook(rookNewx,rookNewy,rookCurrentx,rookCurrenty)
+        king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)     
+        kingx=self.posx
+        kingy=self.posy
+        while round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy or round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
             clicked1=pygame.mouse.get_pressed()
-            self.posx=self.posx+(xPerFrame/75)
-            self.posy=self.posy+(yPerFrame/75)
+            if round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy:##Here I learnt the importance of checking variables,because at multiple points I accidentally
+                #typed an x instead of a y or vice versa.                
+                self.posx=self.posx+(king_x_per_frame/75)
+                self.posy=self.posy+(kiny_y_per_frame/75)
+            if round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
+                eval(rookname).posx=eval(rookname).posx+(rook_x_per_frame/75)
+                eval(rookname).posy=eval(rookname).posy+(rook_y_per_frame/75)
             update(turn)
             self.update()
             pygame.display.update()
             clock.tick(30)
+        self.posx=movetox
+        self.posy=movetoy
+        eval(rookname).posx=rookNewx
+        eval(rookname).posy=rookNewy        
+        theboard.move(kingx,kingy,movetox,movetoy)
+        theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)
+        self.movedyet=True
+        eval(rookname).movedyet=True
 
-        theboard.move(lastposx,lastposy,movetox,movetoy)#
-        theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)#
-        movedList=open("movedlist.txt","a+")#
-        movedList.write("\n"+'castlekingside')#
-        movedList.close()#
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1469,6 +1484,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                     boardState=open("boardstate.txt","a+")
                     boardState.write("\n"+str(theboard.currentBoard())+turn)
                     boardState.close()
+                    check=False #If the piece has made a move, check has been escaped as a piece can't move into check.
                     gameExit,check=checkAlg(turn,check)
 
         except SyntaxError:
@@ -1522,7 +1538,7 @@ def checkAlg(turn,check):
     gameExit=False
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
-            print("check white")
+            print("check on white")
             check=True
             print(dangerPieces)
             if wking.checkmate(turn,check)==True:
@@ -1530,7 +1546,7 @@ def checkAlg(turn,check):
                 gameExit=gameover()
     else:
         if bking.minicheck(board,turn,thex,they)==True:
-            print("check black")
+            print("check on black")
             check=True
             if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
