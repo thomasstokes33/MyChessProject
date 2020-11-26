@@ -96,3 +96,8 @@ function minicheck(board,colour) {
 //around line 697 and of course... 854! 
 //there were a couple of functions that had to be copied, so further forward thinking could've been used to avoid
 //the problems
+
+
+
+
+//stalemate and en passant

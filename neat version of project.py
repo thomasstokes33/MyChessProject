@@ -290,7 +290,7 @@ class piece():
                     SquareToMoveTo=availableSquarex[counter],item 
                     xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1]) #This allows the function to return 
                     #the distance the piece will move per frame 
-            except IndexError:
+            except IndexError: #If item is a string, which it is for castling then the above statements will halt, so this exception bipasses this step.
                 if item[1]=='q':
                      SquareToMoveTo=item
                 elif item[1]=='k':
@@ -825,7 +825,7 @@ class King(piece):
                 return False
             eval(item).checkmateMoves=False
         return True     
-    def distancePerFrameRook(self,movetox,movetoy,currentx,currenty):
+    def distancePerFrameRook(self,movetox,movetoy,currentx,currenty):#this works like the distancePerFrame method.
         movetox=movetox*75  
         movetoy=movetoy*75
         currentx=currentx*75
@@ -846,7 +846,8 @@ class King(piece):
                     
         return xPerFrame,yPerFrame
     def queensidecastle(self,currentTurn):
-        movetox=self.posx-2
+        movetox=self.posx-2 #based on whether it is kingside or queenside the change in x and y will be different so that is why there are
+        #two different subroutines.
         movetoy=self.posy
         rookCurrentx=0
         rookNewx=3
@@ -855,36 +856,16 @@ class King(piece):
             rookNewy=0   
         else:
             rookCurrenty=7
-            rookNewy=7#
-        # rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
-        # rook_x_per_frame,rook_y_per_frame=self.distancePerFrameRook(rookNewx,rookNewy,rookCurrentx,rookCurrenty)
-        # king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)
-    
-        # while round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy or round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
-        #     clicked1=pygame.mouse.get_pressed()
-        #     if round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy:
-        #         self.posx=self.posx+(king_x_per_frame/75)
-        #         self.posy=self.posy+(kiny_y_per_frame/75)
-        #     if round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
-        #         eval(rookname).posx=eval(rookname).posx+(rook_x_per_frame/75)
-        #         eval(rookname).posy=eval(rookname).posy+(rook_y_per_frame/75)
-        #     update(turn)
-        #     self.update()
-        #     pygame.display.update()
-        #     clock.tick(30)
+            rookNewy=7
         
-
-        # self.posx=movetox
-        # self.posy=movetoy
-        # eval(rookname).posx=rookNewx
-        # eval(rookname).posy=rookNewy
-        self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)
-        movedList=open("movedlist.txt","a+")#
-        movedList.write("\n"+'castlequeenside')#
-        movedList.close()#        
+        self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)#this method reduces repeated code and performs the movement animation.
+        #It works much like the moveit method.
+        movedList=open("movedlist.txt","a+")
+        movedList.write("\n"+'castlequeenside')
+        movedList.close()   
 
     def kingsidecastle(self,currentTurn):
-        movetox=self.posx+2
+        movetox=self.posx+2    
         movetoy=self.posy
         rookCurrentx=7
         rookNewx=5
@@ -893,26 +874,26 @@ class King(piece):
             rookNewy=0   
         else:
             rookCurrenty=7
-            rookNewy=7    #
+            rookNewy=7    
 
         self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)
-        movedList=open("movedlist.txt","a+")#
-        movedList.write("\n"+'castlekingside')#
-        movedList.close()#
+        movedList=open("movedlist.txt","a+")
+        movedList.write("\n"+'castlekingside')
+        movedList.close()
 
     def executeCastle(self,movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy): #this method reduces repeated code
         rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
         rook_x_per_frame,rook_y_per_frame=self.distancePerFrameRook(rookNewx,rookNewy,rookCurrentx,rookCurrenty)
         king_x_per_frame,kiny_y_per_frame=self.distancePerFrame(movetox,movetoy)     
         kingx=self.posx
-        kingy=self.posy
+        kingy=self.posy #the above lines get values involved in the moving pieces animation 
         while round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy or round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
             clicked1=pygame.mouse.get_pressed()
             if round(self.posx,1)!=movetox or round(self.posy,1)!=movetoy:##Here I learnt the importance of checking variables,because at multiple points I accidentally
                 #typed an x instead of a y or vice versa.                
                 self.posx=self.posx+(king_x_per_frame/75)
                 self.posy=self.posy+(kiny_y_per_frame/75)
-            if round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:
+            if round(eval(rookname).posx,1)!=rookNewx or round(eval(rookname).posy,1)!=rookNewy:#If one of the pieces has arrived then the other piece can keep moving.
                 eval(rookname).posx=eval(rookname).posx+(rook_x_per_frame/75)
                 eval(rookname).posy=eval(rookname).posy+(rook_y_per_frame/75)
             update(turn)
@@ -921,11 +902,11 @@ class King(piece):
             clock.tick(30)
         self.posx=movetox
         self.posy=movetoy
-        eval(rookname).posx=rookNewx
+        eval(rookname).posx=rookNewx   #The new positions are set as integers
         eval(rookname).posy=rookNewy        
-        theboard.move(kingx,kingy,movetox,movetoy)
+        theboard.move(kingx,kingy,movetox,movetoy)#The board array is updated.
         theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)
-        self.movedyet=True
+        self.movedyet=True #These variables need to be changed so the king or rook can't castle again.
         eval(rookname).movedyet=True
 
 class Queen(piece):
@@ -1472,7 +1453,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                     try:
                         moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
                         #the square the user clicked on. 
-                    except TypeError:
+                    except TypeError: #If it is a string, namely "kingside" or "queenside" then a separate method is called.
                         if SquareTo[1]=='q':
                             eval(currentmovingpiece).queensidecastle(turn)
                         if SquareTo[1]=='k':
