@@ -95,7 +95,7 @@ function minicheck(board,colour) {
 //the castling gets a bit messy in terms of eval and accessing attributes without using a function.
 //around line 697 and of course... 854! 
 //there were a couple of functions that had to be copied, so further forward thinking could've been used to avoid
-//the problems
+//the problems. I could also have made code simpler and used less if statements.
 
 
 
