@@ -1,13 +1,17 @@
 ##The general game loop on line 1422 was from a part of series that taught me the basics of pygame. https://www.youtube.com/watch?v=ujOTNg17LjI&list=PLQVvvaa0QuDdLkP8MrOXLe_rKuf6r80KO
 #technical
-
+a = 100
+b = 38
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (a,b) ##These lines are from https://www.pygame.org/wiki/SettingWindowPosition#:~:text=You%20can%20set%20the%20position,be%20set%20with%20the%20os.
+#and allowed me to set the position of the pygame window initially, because it would appear offscreen.
 import pprint
 import pygame
 import time
 import math  #imports modules
 pygame.init()
 displayWidth=600
-displayHeight=610
+displayHeight=640
 black=(0,0,0)
 white=(255,255,255)
 red=(255,0,0)
@@ -1408,16 +1412,19 @@ def getmouse():
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                   
-                    pygame.quit()    
+                    pygame.quit()       
                     quit()
-            
-        
+        if (mouse[0])>262 and (mouse[0])<337 and mouse[1]>600:
+            currentPiece="restart"            
+    
         mousex=mouse[0]//75 #These 2 statements sort of act as a hashing algorithm reducing the board to 8*8 as opposed to 600*600
         mousey=mouse[1]//75
         if mousey<=7:
             currentPiece=pieceInPos(mousex,mousey)
         
-        
+
+            
+       
         
     return (mousex,mousey,currentPiece) 
 
@@ -1433,9 +1440,12 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
 
 
     
-     
+    if currentPiece=="restart":
+        gameExit=True
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check      
 
     if mousex!=None and mousey!=None:
+
         try:
                 print()
                 print()
@@ -1478,7 +1488,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
         return None
      
 def update(turn):
-
+    chessDisplay.fill(white)
     chessDisplay.blit(chessBoard,(0,0))
     #It reads from different ends of the allPieces list 
     #so when the pieces of the player whose turn it is take other pieces they glide
@@ -1493,6 +1503,8 @@ def update(turn):
 
         for x in allPieces: 
             eval(x).update()
+    restart=pygame.image.load('reloadimgsmall.png')
+    chessDisplay.blit(restart,(280,600))
             
 
 def checkAlg(turn,check):
@@ -1544,6 +1556,9 @@ def start(turn): #this function is the main game loop and repeats over and over 
     boardState.write("boardstate")
     boardState.write("\n"+str(theboard.currentBoard())+turn)
     boardState.close()
+    update(turn)
+    pygame.display.update()
+    
     while not gameExit:
         for x in range(len(dangerPieces)):
             dangerPieces.pop(0)
@@ -1556,7 +1571,8 @@ def start(turn): #this function is the main game loop and repeats over and over 
             
 
             returned,current,squ,xPerFrame,yPerFrame,turn,gameExit,check=move(returned,current,squ,xPerFrame,yPerFrame,turn,check)
-            
+            if gameExit==True:
+                print("exit")
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
             pygame.display.update()#This displays all change to the actual display
             clock.tick(30)

@@ -90,7 +90,7 @@ function minicheck(board,colour) {
 
 
 
-//I've added game over and castling(fingers crossed). make sure to remove excess hashtags or slashes and print
+//I've added game over and castling(fingers crossed) and restart button. make sure to remove excess hashtags or slashes and print
 //statements
 //the castling gets a bit messy in terms of eval and accessing attributes without using a function.
 //around line 697 and of course... 854! 
