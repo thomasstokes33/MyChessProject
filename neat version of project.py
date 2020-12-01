@@ -20,7 +20,7 @@ blue=(0,0,255)
 
 
 
-chessDisplay=pygame.display.set_mode((displayWidth,displayHeight))#sets up display
+chessDisplay=pygame.display.set_mode((displayWidth,displayHeight),pygame.RESIZABLE)#sets up display
 pygame.display.set_caption('Chess')#sets caption of window
 icon=pygame.image.load("whitepawn.png")
 pygame.display.set_icon(icon)
@@ -1419,7 +1419,7 @@ def getmouse():
     
         mousex=mouse[0]//75 #These 2 statements sort of act as a hashing algorithm reducing the board to 8*8 as opposed to 600*600
         mousey=mouse[1]//75
-        if mousey<=7:
+        if mousey<=7 and mousex<8:
             currentPiece=pieceInPos(mousex,mousey)
         
 
@@ -1567,8 +1567,10 @@ def start(turn): #this function is the main game loop and repeats over and over 
             if event.type==pygame.QUIT: #this allows the player to quit the game
                 pygame.quit()    
                 quit()
+            if event.type == pygame.VIDEORESIZE:
+                # There's some code to add back window content here.
+                surface = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)   
                 
-            
 
             returned,current,squ,xPerFrame,yPerFrame,turn,gameExit,check=move(returned,current,squ,xPerFrame,yPerFrame,turn,check)
             if gameExit==True:
