@@ -284,7 +284,9 @@ class piece():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
-                    
+        if (mouse1[0])>262 and (mouse1[0])<337 and mouse1[1]>600:
+            SquareToMoveTo="restart" 
+            return SquareToMoveTo,xPerFrame,yPerFrame                    
         counter=0
         SquareToMoveTo=None,None
         xPerFrame,yPerFrame=None,None
@@ -1454,7 +1456,9 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                 print(mousex,mousey,currentPiece)
                 #The eval statement below was to ensure it ran as python code opposed to as a string.
                 SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn,check)#There is a different method 
-
+                if SquareTo=="restart":
+                    gameExit=True
+                    return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check
 
                 #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
