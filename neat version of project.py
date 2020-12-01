@@ -309,7 +309,7 @@ class piece():
     def moveit(self,thesquare,xPerFrame,yPerFrame,turn,current_piece):
         lastposx=self.posx
         lastposy=self.posy
-        #maybe add a a attribute called last square or even attributes for the moving created in the algorithm above
+        
         squarex=thesquare[0]
         squarey=thesquare[1]
         print(thesquare)
