@@ -1512,7 +1512,7 @@ def update(turn):
     chessDisplay.blit(restart,(280,600))
             
 
-def checkAlg(turn,check):
+def checkAlg(turn,check):#This functions in a similar manner to the endangersking method.
     print("Check algorithm")
     print(dangerPieces)
     tempY=0
