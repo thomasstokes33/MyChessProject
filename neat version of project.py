@@ -1309,7 +1309,8 @@ class Pawn(piece):
                             
                             square=self.posy-x
                         else:
-                            square=self.posy-1
+                            square=self.posy-1##There could be an improvement here as this line runs twice
+                            #when it only needs to run once(the pawn can only move forward one space after the first move)
                          
                     else:#If they are black they move away from the x axis(hence add 1).
                         if self.movedyet==False:
