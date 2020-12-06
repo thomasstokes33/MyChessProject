@@ -1382,7 +1382,7 @@ class Pawn(piece):
                         lastvalue=check#if the loop continues the previous line is stored.
                         check=movedList.readline()
 
-                    if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last move piece must be a pawn
+                    if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last moved piece must be a pawn and it must've been that pawn's first move.
                         if (lastvalue[0]=='b' and turn=='white') or (lastvalue[0]=='w' and turn=='black'):#and not one of the current player's pieces.
                             value=eval(lastvalue[0:6]).coordinates()
                             print(value)
