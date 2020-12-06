@@ -141,7 +141,8 @@ class board1():
         self.board[newy][newx]=record
         self.display()
               
-              
+    def enpassantremove(self,posx,posy):
+        self.board[posy][posx]=''          
             
             
         
@@ -334,9 +335,19 @@ class piece():
         self.posx=squarex #sets posx and posy to move-to-coordinates.
         self.posy=squarey
         takenPiece=theboard.getpiece(self.posx,self.posy) #this records the piece that will be taken, if any.
-        
+        try:
+            if self.enpassant==(squarex,squarey):
+                if self.colour=='black':
+                    takenPiece=theboard.getpiece(self.posx,self.posy-1)
+                    theboard.enpassantremove(self.posx,self.posy-1)
+                else:
+                    takenPiece=theboard.getpiece(self.posx,self.posy+1)
+                    theboard.enpassantremove(self.posx,self.posy+1)##I had an error where the pawn wasn't removed from the board.
+                
+            self.enpassant=''
+        except AttributeError:
+            pass
         theboard.move(lastposx,lastposy,squarex,squarey)#this moves the piece in the board array(an attribute of the board class)
-        self.movedyet=True 
         if takenPiece!='':
             allPieces.remove(takenPiece) #if a piece was taken it is removed from the update list.
         if self.ptype=='pawn': #if pawn has reached backrow it is upgraded.
@@ -346,9 +357,11 @@ class piece():
             elif self.colour=='white' and self.posy==0:
                 print("upgrade")
                 self.upgradePawn(current_piece,self.colour)
-        movedList=open("movedlist.txt","a+")
-        movedList.write("\n"+current_piece)
-        movedList.close()
+        if self.movedyet==False:
+            self.movedyet=True      
+            current_piece=current_piece+'1'#This is used for 'en passant' to symbolise that it is the pawn's first move.
+        updatemovedlist(current_piece)
+
         return False
     
     def distancePerFrame(self,movetox,movetoy):
@@ -866,9 +879,7 @@ class King(piece):
         
         self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)#this method reduces repeated code and performs the movement animation.
         #It works much like the moveit method.
-        movedList=open("movedlist.txt","a+")
-        movedList.write("\n"+'castlequeenside')
-        movedList.close()   
+        updatemovedlist('queensidecastle')
 
     def kingsidecastle(self,currentTurn):
         movetox=self.posx+2    
@@ -883,9 +894,7 @@ class King(piece):
             rookNewy=7    
 
         self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)
-        movedList=open("movedlist.txt","a+")
-        movedList.write("\n"+'castlekingside')
-        movedList.close()
+        updatemovedlist('kingsidecastle')
 
     def executeCastle(self,movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy): #this method reduces repeated code
         rookname=theboard.getpiece(rookCurrentx,rookCurrenty)
@@ -1282,6 +1291,7 @@ class Pawn(piece):
         self.movedyet=False
         self.colour=colour
         self.checkmateAlg=False
+        self.enpassant=''
         self.checkmateMoves=False
         if self.colour=='black':
             self.image=pygame.image.load("blackpawn.png")
@@ -1302,11 +1312,8 @@ class Pawn(piece):
                 closestEmpty=True #If the square closest to the pawn is filled then the pawn can't move. 
                
                 for x in range(1,3):
-                    
                     if self.colour=='white': #If the pieces are white they move towards the x axis(remember that (0,0) is in top left corner)
-
                         if self.movedyet==False:
-                            
                             square=self.posy-x
                         else:
                             square=self.posy-1##There could be an improvement here as this line runs twice
@@ -1344,11 +1351,7 @@ class Pawn(piece):
 
                             
                             
-            
-                    
 
-              
-                   
                 for x in range(-1,2):#This checks if the piece can take diagonals. 
                     if x!=0:
                         if self.colour=='white':
@@ -1369,8 +1372,38 @@ class Pawn(piece):
                                 if self.endangersKing(turn,squarex,squarey)==False:
                                     availableSquares.append(squarey)
                                     availableSquarex.append(squarex)
-                
+                #en passant
+                if (self.colour=='black' and self.posy==4)or(self.colour=='white' and self.posy==3):#The pieces must be on the right row/rank.
+                    movedList=open("movedList.txt","r+")
+                    movedList.seek(0)
+                    check=1 #1 is random and just allows the loop to start. 
+                    while check != '':#This loop gets the name of the last moved piece. It works by peeking at the next line until it is
+                        #blank and then it returns the previous line(the last moved piece).
+                        lastvalue=check#if the loop continues the previous line is stored.
+                        check=movedList.readline()
+
+                    if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last move piece must be a pawn
+                        if (lastvalue[0]=='b' and turn=='white') or (lastvalue[0]=='w' and turn=='black'):#and not one of the current player's pieces.
+                            value=eval(lastvalue[0:6]).coordinates()
+                            print(value)
+                            if value[1]==self.posy and (value[0]==self.posx+1 or value[0]==self.posx-1):#it must end up adjacent to the clicked on piece
+                                squarex=value[0]
+                                print("en passant")
+                                if turn=='black':
+                                    squarey=value[1]+1
+                                else:
+                                    squarey=value[1]-1
+                                if self.endangersKing(turn,squarex,squarey)==False:
+                                    availableSquares.append(squarey)
+                                    availableSquarex.append(squarex)
+                                    self.enpassant=squarex,squarey
+                                 
+
+
+
+
                 if availableSquares== []:
+                    print("no moves")
                     SquareToMoveTo=None,None
                     return SquareToMoveTo,xPerFrame,yPerFrame
 
@@ -1381,6 +1414,7 @@ class Pawn(piece):
                     SquareToMoveTo,xPerFrame,yPerFrame=self.showSquares(availableSquares,availableSquarex,xPerFrame,yPerFrame)                    
                     return SquareToMoveTo,xPerFrame,yPerFrame
          else:
+            print("not your piece")
             SquareToMoveTo=None,None
             return SquareToMoveTo,xPerFrame,yPerFrame 
 
@@ -1581,7 +1615,17 @@ def start(turn): #this function is the main game loop and repeats over and over 
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
             pygame.display.update()#This displays all change to the actual display
             clock.tick(30)
-            
+def updatemovedlist(piece):#I added this function so that there is one place where the movedList text file is edited.
+    movedList=open("movedlist.txt","a+")
+    if piece=='queensidecastle':
+        movedList.write("\n"+'castlequeenside')
+    elif piece=='kingsidecastle':
+        movedList.write("\n"+'castlekingside')
+    else:
+        movedList.write("\n"+piece)
+   
+
+    movedList.close()          
         
         
          

@@ -100,4 +100,7 @@ function minicheck(board,colour) {
 
 
 
-//stalemate and en passant
+//stalemate, draws and en passant
+
+//i learnt that by trying to reduce the number of lines of code you could make
+//efficient solutions, like line 1371, that uses the while loop as an if statement.
