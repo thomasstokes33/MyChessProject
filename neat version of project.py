@@ -1376,11 +1376,11 @@ class Pawn(piece):
                 if (self.colour=='black' and self.posy==4)or(self.colour=='white' and self.posy==3):#The pieces must be on the right row/rank.
                     movedList=open("movedList.txt","r+")
                     movedList.seek(0)
-                    check=1 #1 is random and just allows the loop to start. 
-                    while check != '':#This loop gets the name of the last moved piece. It works by peeking at the next line until it is
+                    checkdig='1' #1 is random and just allows the loop to start. 
+                    while checkdig != '':#This loop gets the name of the last moved piece. It works by peeking at the next line until it is
                         #blank and then it returns the previous line(the last moved piece).
-                        lastvalue=check#if the loop continues the previous line is stored.
-                        check=movedList.readline()
+                        lastvalue=checkdig#if the loop continues the previous line is stored.
+                        checkdig=movedList.readline()
                     if len(lastvalue)==7:##This line had to be added after an index error came up where the length was less than 7.
                         if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last moved piece must be a pawn and it must've been that pawn's first move.
                             if (lastvalue[0]=='b' and turn=='white') or (lastvalue[0]=='w' and turn=='black'):#and not one of the current player's pieces.
@@ -1587,7 +1587,8 @@ def checkAlg(turn,check):#This functions in a similar manner to the endangerskin
     if check==False:
         print("Checking for stalemate...")
         gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
-    
+        if gameExit==False:
+            gameExit=draw(turn,check)
     return gameExit,check
 def stalemate(turn,check):#turn here represents the next player
     stalemate=True
@@ -1620,7 +1621,18 @@ def stalemate(turn,check):#turn here represents the next player
     else:
         print("no stalemate")
     return gameExit
-    
+
+def draw(check,turn):
+    if insufficientMaterial()==True:
+        gameExit=gameover()
+        return gameExit
+    if fiftymoves()==True:
+        gameExit=gameover()
+        return gameExit
+    if threefoldRep()==True:
+        gameExit=gameover()
+        return gameExit
+    return False
 
 
 
@@ -1662,7 +1674,16 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
    
     movedList.close()          
         
+def fiftymoves() :
+    pass
+def threefoldRep():
+    boardState=open("boardstate.txt","a+")
+    boardstates=boardState.read()
+    print
         
+    
+def insufficientMaterial():
+    pass
          
 if __name__=="__main__":
     while True: 
