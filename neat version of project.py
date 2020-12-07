@@ -350,6 +350,11 @@ class piece():
         theboard.move(lastposx,lastposy,squarex,squarey)#this moves the piece in the board array(an attribute of the board class)
         if takenPiece!='':
             allPieces.remove(takenPiece) #if a piece was taken it is removed from the update list.
+
+        if takenPiece!='' or self.ptype=='pawn':
+            globalcounter=0
+        else:
+            globalcounter+=1
         if self.ptype=='pawn': #if pawn has reached backrow it is upgraded.
             if self.colour=='black' and self.posy==7: 
                 print("upgrade")
@@ -770,9 +775,6 @@ class King(piece):
                 dangerPiecesRecord.append(items)      
 
 
-
-
-        
         
         for u in range(len(dangerPieces)):
            
@@ -880,7 +882,7 @@ class King(piece):
         self.executeCastle(movetox,movetoy,rookCurrentx,rookCurrenty,rookNewx,rookNewy)#this method reduces repeated code and performs the movement animation.
         #It works much like the moveit method.
         updatemovedlist('queensidecastle')
-
+        
     def kingsidecastle(self,currentTurn):
         movetox=self.posx+2    
         movetoy=self.posy
@@ -923,7 +925,8 @@ class King(piece):
         theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)
         self.movedyet=True #These variables need to be changed so the king or rook can't castle again.
         eval(rookname).movedyet=True
-
+        # updatecastlevariable="global"+self.colour[0]+"castle"   ###to finish
+        # globals()[updatecastlevariable]=False
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1640,7 +1643,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
     returned,current,squ,xPerFrame,yPerFrame,check=None,None,None,None,None,False
     boardState=open("boardstate.txt","w")
     boardState.write("boardstate")
-    boardState.write("\n"+str(theboard.currentBoard())+turn)
+    boardState.write("\n"+str(theboard.currentBoard())+turn)#+'bc'+'wc')###to do
     boardState.close()
     update(turn)
     pygame.display.update()
@@ -1674,7 +1677,10 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
     movedList.close()          
         
 def fiftymoves() :
-    pass
+    if globalcounter>=50:
+        gameExit=gameover()
+        return gameExit
+    return False
 def threefoldRep():
     boardState=open("boardstate.txt","a+")
     boardState.seek(0)
@@ -1695,7 +1701,6 @@ def threefoldRep():
         return True
     return False
         
-    
 def insufficientMaterial():
     pass
          
@@ -1752,7 +1757,10 @@ if __name__=="__main__":
         wknight2=Knight("knight",7,6,"white")
         wrook2=Rook("rook",7,7,"white")
         turn='white'
-
+        globalwcastle=True
+        globalbcastle=True
+        globalcounter=0
+        globalenpassant=False
         start(turn)
 
 
