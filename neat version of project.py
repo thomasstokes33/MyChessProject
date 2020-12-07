@@ -1429,8 +1429,7 @@ def gameover():
                 if event.type==pygame.QUIT:
                     pygame.quit()    
                     quit()
-    gameExit=True
-    return gameExit
+    return True #this sets game exit to false
      
          
 
@@ -1678,8 +1677,23 @@ def fiftymoves() :
     pass
 def threefoldRep():
     boardState=open("boardstate.txt","a+")
-    boardstates=boardState.read()
-    print
+    boardState.seek(0)
+    checkdig='1'
+    array=[]
+    while checkdig != '':
+        lastvalue=checkdig.strip("\n")
+        if checkdig!='1':
+            array.append(lastvalue)
+        checkdig=boardState.readline()
+        
+    counter=0
+    while (lastvalue) in array:
+        counter+=1
+        array.remove(lastvalue)
+    if counter>=3:
+        print("Threefold repetition")
+        return True
+    return False
         
     
 def insufficientMaterial():

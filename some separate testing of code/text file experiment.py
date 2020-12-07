@@ -1,4 +1,6 @@
-textfile=open("text.txt","a+")
+textfile=open(r"some separate testing of code/text.txt","a+")
+
+textfile.seek(0)
 print(textfile.read())
 textfile.seek(0)
 x='2'
