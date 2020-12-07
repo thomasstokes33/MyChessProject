@@ -104,3 +104,7 @@ function minicheck(board,colour) {
 
 //i learnt that by trying to reduce the number of lines of code you could make
 //efficient solutions, like line 1371, that uses the while loop as an if statement.
+
+
+
+//i forgot about the != operator.

@@ -1381,22 +1381,22 @@ class Pawn(piece):
                         #blank and then it returns the previous line(the last moved piece).
                         lastvalue=check#if the loop continues the previous line is stored.
                         check=movedList.readline()
-
-                    if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last moved piece must be a pawn and it must've been that pawn's first move.
-                        if (lastvalue[0]=='b' and turn=='white') or (lastvalue[0]=='w' and turn=='black'):#and not one of the current player's pieces.
-                            value=eval(lastvalue[0:6]).coordinates()
-                            print(value)
-                            if value[1]==self.posy and (value[0]==self.posx+1 or value[0]==self.posx-1):#it must end up adjacent to the clicked on piece
-                                squarex=value[0]
-                                print("en passant")
-                                if turn=='black':
-                                    squarey=value[1]+1
-                                else:
-                                    squarey=value[1]-1
-                                if self.endangersKing(turn,squarex,squarey)==False:
-                                    availableSquares.append(squarey)
-                                    availableSquarex.append(squarex)
-                                    self.enpassant=squarex,squarey
+                    if len(lastvalue)==7:##This line had to be added after an index error came up where the length was less than 7.
+                        if lastvalue[1:5]=='pawn' and lastvalue[6]=='1':#last moved piece must be a pawn and it must've been that pawn's first move.
+                            if (lastvalue[0]=='b' and turn=='white') or (lastvalue[0]=='w' and turn=='black'):#and not one of the current player's pieces.
+                                value=eval(lastvalue[0:6]).coordinates()
+                                print(value)
+                                if value[1]==self.posy and (value[0]==self.posx+1 or value[0]==self.posx-1):#it must end up adjacent to the clicked on piece
+                                    squarex=value[0]
+                                    print("en passant")
+                                    if turn=='black':
+                                        squarey=value[1]+1
+                                    else:
+                                        squarey=value[1]-1
+                                    if self.endangersKing(turn,squarex,squarey)==False:
+                                        availableSquares.append(squarey)
+                                        availableSquarex.append(squarex)
+                                        self.enpassant=squarex,squarey
                                  
 
 
@@ -1583,13 +1583,47 @@ def checkAlg(turn,check):#This functions in a similar manner to the endangerskin
             if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
                 gameExit=gameover()
+    print("Check alg complete. ")
     if check==False:
-        stalemate(turn)           
+        print("Checking for stalemate...")
+        gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
     
-    print("chk alg comp")
     return gameExit,check
-def stalemate(turn):
-    pass    
+def stalemate(turn,check):#turn here represents the next player
+    stalemate=True
+    if turn=='white': #This small section gets all the next player's pieces to see if they can make any legal moves.
+        start=-1
+        increment=-1 #The start and increment are different because all pieces of the same colour are stored next to each other in the list.
+    else:
+        start=0
+        increment=1
+    item=turn#initiates loop
+    moveablePieces=[]
+    while item[0]==turn[0]:
+        if item!=turn:
+            moveablePieces.append(item)
+        item=allPieces[start]
+        start=start+increment
+    
+    for piece in moveablePieces:
+        if stalemate==True:
+            
+            eval(piece).checkmateMoves=True  #This utilises an attribute used for the checkmate alg, which stops the showSquares algorithm from running.
+            move= eval(piece).get_moves(0,0,turn,check)
+            if move[0]!=(None,None):
+                stalemate=False
+            eval(piece).checkmateMoves=False
+    gameExit=False
+    if stalemate==True:
+        print("stalemate on "+turn)
+        gameExit=gameover()
+    else:
+        print("no stalemate")
+    return gameExit
+    
+
+
+
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame,check=None,None,None,None,None,False
@@ -1626,7 +1660,6 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
     else:
         movedList.write("\n"+piece)
    
-
     movedList.close()          
         
         
