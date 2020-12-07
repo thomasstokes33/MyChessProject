@@ -1583,11 +1583,13 @@ def checkAlg(turn,check):#This functions in a similar manner to the endangerskin
             if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
                 gameExit=gameover()
-               
+    if check==False:
+        stalemate(turn)           
     
     print("chk alg comp")
     return gameExit,check
-    
+def stalemate(turn):
+    pass    
 def start(turn): #this function is the main game loop and repeats over and over again.
     gameExit=False 
     returned,current,squ,xPerFrame,yPerFrame,check=None,None,None,None,None,False
