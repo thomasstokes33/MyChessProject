@@ -369,9 +369,7 @@ class piece():
         if self.movedyet==False:
             self.movedyet=True      
             current_piece=current_piece+'1'#This is used for 'en passant' to symbolise that it is the pawn's first move.
-        if self.ptype=='king':
-            updatecastlevariable="global"+self.colour[0]+"castle"   ###to finish
-            globals()[updatecastlevariable]=False            
+                 
         updatemovedlist(current_piece)
 
         return False,fiftymovescounter
@@ -734,6 +732,7 @@ class King(piece):
                         if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
                             if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
                                 availableSquares.append(str(self.colour)[0]+"kingside")
+                                
                             else:#this is printed if minicheck is true for any of the squares.
                                 print("castling not available")
                     #queenside
@@ -1519,9 +1518,17 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fift
                         turn='white'
                     else:
                         turn='black'
+
+                    check=False #If the piece has made a move, check has been escaped as a piece can't move into check.
+                    gameExit,check,fiftymovescounter=checkAlg(turn,check,fiftymovescounter)
                     boardState=open("boardstate.txt","a+")
                     string="\n"+str(theboard.currentBoard())+turn
-                    if globalbcastle==True:
+                    
+                    globalwcastle=False
+                    globalbcastle=False
+                    canCastle(turn,check)
+                    canEnPassant()
+                    if globalbcastle==True: #this is for the threefold repetition rule.
                         string=string+"bcT"
                     else:
                         string=string+"bcF"
@@ -1532,8 +1539,16 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fift
 
                     boardState.write(string)
                     boardState.close()
-                    check=False #If the piece has made a move, check has been escaped as a piece can't move into check.
-                    gameExit,check,fiftymovescounter=checkAlg(turn,check,fiftymovescounter)
+
+
+
+
+                    if check==False:
+                        print("Checking for stalemate...")
+                        gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
+                        if gameExit==False:
+                            gameExit=draw(turn,check,fiftymovescounter)
+
 
         except SyntaxError:
                 print(mousex,mousey,"Square empty")
@@ -1603,11 +1618,7 @@ def checkAlg(turn,check,fiftymovescounter):#This functions in a similar manner t
                 print("CHECKMATE")
                 gameExit=gameover()
     print("Check alg complete. ")
-    if check==False:
-        print("Checking for stalemate...")
-        gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
-        if gameExit==False:
-            gameExit=draw(turn,check,fiftymovescounter)
+
 
     return gameExit,check,fiftymovescounter
 def stalemate(turn,check):#turn here represents the next player
@@ -1662,7 +1673,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
     boardState=open("boardstate.txt","w")
     boardState.write("boardstate")
     fiftymovescounter=0 
-    boardState.write("\n"+str(theboard.currentBoard())+turn+'bcT'+'wcT')###to do
+    boardState.write("\n"+str(theboard.currentBoard())+turn+'bcF'+'wcF')###to do
     boardState.close()
     update(turn)
     pygame.display.update()
@@ -1696,6 +1707,7 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
     movedList.close()          
         
 def fiftymoves(fiftymovescounter):
+    print("---moves counter:",fiftymovescounter)
     if fiftymovescounter>=50:
         gameExit=gameover()
         return gameExit
@@ -1722,7 +1734,30 @@ def threefoldRep():
         
 def insufficientMaterial():
     pass
-         
+
+def canCastle(turn,check):
+    if turn=='white': #This small section gets all the next player's pieces to see if they can make any legal moves.
+        start=-1
+        increment=-1 #The start and increment are different because all pieces of the same colour are stored next to each other in the list.
+    else:
+        start=0
+        increment=1
+    item=turn#initiates loop
+    moveablePieces=[]
+    while item[0]==turn[0]:
+        if item!=turn:
+            moveablePieces.append(item)
+        item=allPieces[start]
+        start=start+increment
+    for piece in moveablePieces:
+        if eval(piece).ptype=='king':
+            eval(piece).checkmateMoves=True
+            eval(piece).get_moves(5,5,turn,check)
+            eval(piece).checkmateMoves=False
+def canEnPassant():
+    pass
+
+
 if __name__=="__main__":
     while True: 
         #this creates the game and classes. 
@@ -1776,8 +1811,7 @@ if __name__=="__main__":
         wknight2=Knight("knight",7,6,"white")
         wrook2=Rook("rook",7,7,"white")
         turn='white'
-        globalwcastle=True
-        globalbcastle=True
+        
         
         start(turn)
         print("restarting")
