@@ -247,7 +247,7 @@ class piece():
         for item in availableSquarey:
                 try:
                     pygame.draw.rect(chessDisplay,blue,((availableSquarex[(counter)])*75,(item*75),75,75),1)
-                except IndexError:
+                except IndexError:#this is for castling
                         if item[1]=='q':
                             print(item)
                             if item[0]=='b':
@@ -291,23 +291,27 @@ class piece():
         counter=0
         SquareToMoveTo=None,None
         xPerFrame,yPerFrame=None,None
+        print(availableSquarex)
+        print(availableSquarey)
         for item in availableSquarey:
-            try:
-                if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>item*75 and mouse1[1]<(item*75)+75):
-                    SquareToMoveTo=availableSquarex[counter],item 
-                    xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1]) #This allows the function to return 
-                    #the distance the piece will move per frame 
-            except IndexError: #If item is a string, which it is for castling then the above statements will halt, so this exception bipasses this step.
-                if item[1]=='q':
-                     SquareToMoveTo=item
-                elif item[1]=='k':
-                    SquareToMoveTo=item
+            if SquareToMoveTo== (None,None):
+                try:
+                    if (mouse1[0]>(availableSquarex[counter]*75) and mouse1[0]<((availableSquarex[counter]*75)+75))and(mouse1[1]>item*75 and mouse1[1]<(item*75)+75):
+                        SquareToMoveTo=availableSquarex[counter],item 
+                        xPerFrame,yPerFrame=self.distancePerFrame(SquareToMoveTo[0],SquareToMoveTo[1]) #This allows the function to return 
+                        #the distance the piece will move per frame 
+                except IndexError: #the castling option is always the last in the list. 
+                    if (item[0]=='b' and mouse1[1]>0 and mouse1[1]<75)or(item[0]=='w' and mouse1[1]>75*7 and mouse1[1]<75*8):
+                        if item[1]=='q' and mouse1[0]>2*75 and mouse1[0]<3*75:
+                            SquareToMoveTo=item
+                        elif item[1]=='k' and mouse1[0]>6*75 and mouse1[0]<7*75:
+                            SquareToMoveTo=item
 
             counter+=1
         #If the user doesn't click in the blue boxes, None is returned for all fields.
         return SquareToMoveTo,xPerFrame,yPerFrame
 
-    def moveit(self,thesquare,xPerFrame,yPerFrame,turn,current_piece):
+    def moveit(self,thesquare,xPerFrame,yPerFrame,turn,current_piece,fiftymovescounter):
         lastposx=self.posx
         lastposy=self.posy
         
@@ -350,11 +354,11 @@ class piece():
         theboard.move(lastposx,lastposy,squarex,squarey)#this moves the piece in the board array(an attribute of the board class)
         if takenPiece!='':
             allPieces.remove(takenPiece) #if a piece was taken it is removed from the update list.
-
+    
         if takenPiece!='' or self.ptype=='pawn':
-            globalcounter=0
+            fiftymovescounter=0
         else:
-            globalcounter+=1
+            fiftymovescounter+=1
         if self.ptype=='pawn': #if pawn has reached backrow it is upgraded.
             if self.colour=='black' and self.posy==7: 
                 print("upgrade")
@@ -365,9 +369,12 @@ class piece():
         if self.movedyet==False:
             self.movedyet=True      
             current_piece=current_piece+'1'#This is used for 'en passant' to symbolise that it is the pawn's first move.
+        if self.ptype=='king':
+            updatecastlevariable="global"+self.colour[0]+"castle"   ###to finish
+            globals()[updatecastlevariable]=False            
         updatemovedlist(current_piece)
 
-        return False
+        return False,fiftymovescounter
     
     def distancePerFrame(self,movetox,movetoy):
         movetox=movetox*75  
@@ -925,8 +932,7 @@ class King(piece):
         theboard.move(rookCurrentx,rookCurrenty,rookNewx,rookNewy)
         self.movedyet=True #These variables need to be changed so the king or rook can't castle again.
         eval(rookname).movedyet=True
-        # updatecastlevariable="global"+self.colour[0]+"castle"   ###to finish
-        # globals()[updatecastlevariable]=False
+        
 class Queen(piece):
     def __init__(self,ptype,posy,posx,colour):
         self.ptype=ptype
@@ -1471,7 +1477,7 @@ def pieceInPos(mousex,mousey):#This just gets the name of piece in the position 
     piece=theboard.getpiece(mousex,mousey)
     return piece
 
-def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
+def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fiftymovescounter):
     gameExit=False#Once in this loop the game isn't exiting. This is also used to stop and error, where this value
     #isn't defined
     
@@ -1481,7 +1487,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
     
     if currentPiece=="restart":
         gameExit=True
-        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check      
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check,fiftymovescounter    
 
     if mousex!=None and mousey!=None:
 
@@ -1495,14 +1501,14 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                 SquareTo,xPerFrame,yPerFrame=eval(currentPiece).get_moves(xPerFrame,yPerFrame,turn,check)#There is a different method 
                 if SquareTo=="restart":
                     gameExit=True
-                    return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check
+                    return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check,fiftymovescounter
 
                 #for each piece that runs here to calculate available moves.
                 print(SquareTo,xPerFrame,yPerFrame)
                 if SquareTo != (None,None):#If there are available moves then:                   
                     currentmovingpiece=currentPiece
                     try:
-                        moving1=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece)#This moves the piece to
+                        moving1,fiftymovescounter=eval(currentmovingpiece).moveit(SquareTo,xPerFrame,yPerFrame,turn,currentmovingpiece,fiftymovescounter)#This moves the piece to
                         #the square the user clicked on. 
                     except TypeError: #If it is a string, namely "kingside" or "queenside" then a separate method is called.
                         if SquareTo[1]=='q':
@@ -1514,16 +1520,27 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check):
                     else:
                         turn='black'
                     boardState=open("boardstate.txt","a+")
-                    boardState.write("\n"+str(theboard.currentBoard())+turn)
+                    string="\n"+str(theboard.currentBoard())+turn
+                    if globalbcastle==True:
+                        string=string+"bcT"
+                    else:
+                        string=string+"bcF"
+                    if globalwcastle==True:
+                        string=string+"wcT"
+                    else:
+                        string=string+"wcF"
+
+                    boardState.write(string)
                     boardState.close()
                     check=False #If the piece has made a move, check has been escaped as a piece can't move into check.
-                    gameExit,check=checkAlg(turn,check)
+                    gameExit,check,fiftymovescounter=checkAlg(turn,check,fiftymovescounter)
 
         except SyntaxError:
                 print(mousex,mousey,"Square empty")
                 print()
     try:
-        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check
+        
+        return moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,gameExit,check,fiftymovescounter
     except:
         print("not returning")
         return None
@@ -1548,7 +1565,7 @@ def update(turn):
     chessDisplay.blit(restart,(280,600))
             
 
-def checkAlg(turn,check):#This functions in a similar manner to the endangersking method.
+def checkAlg(turn,check,fiftymovescounter):#This functions in a similar manner to the endangersking method.
     print("Check algorithm")
     print(dangerPieces)
     tempY=0
@@ -1590,8 +1607,9 @@ def checkAlg(turn,check):#This functions in a similar manner to the endangerskin
         print("Checking for stalemate...")
         gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
         if gameExit==False:
-            gameExit=draw(turn,check)
-    return gameExit,check
+            gameExit=draw(turn,check,fiftymovescounter)
+
+    return gameExit,check,fiftymovescounter
 def stalemate(turn,check):#turn here represents the next player
     stalemate=True
     if turn=='white': #This small section gets all the next player's pieces to see if they can make any legal moves.
@@ -1624,11 +1642,11 @@ def stalemate(turn,check):#turn here represents the next player
         print("no stalemate")
     return gameExit
 
-def draw(check,turn):
+def draw(check,turn,fiftymovescounter):
     if insufficientMaterial()==True:
         gameExit=gameover()
         return gameExit
-    if fiftymoves()==True:
+    if fiftymoves(fiftymovescounter)==True:
         gameExit=gameover()
         return gameExit
     if threefoldRep()==True:
@@ -1643,7 +1661,8 @@ def start(turn): #this function is the main game loop and repeats over and over 
     returned,current,squ,xPerFrame,yPerFrame,check=None,None,None,None,None,False
     boardState=open("boardstate.txt","w")
     boardState.write("boardstate")
-    boardState.write("\n"+str(theboard.currentBoard())+turn)#+'bc'+'wc')###to do
+    fiftymovescounter=0 
+    boardState.write("\n"+str(theboard.currentBoard())+turn+'bcT'+'wcT')###to do
     boardState.close()
     update(turn)
     pygame.display.update()
@@ -1659,7 +1678,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
              
                 
 
-            returned,current,squ,xPerFrame,yPerFrame,turn,gameExit,check=move(returned,current,squ,xPerFrame,yPerFrame,turn,check)
+            returned,current,squ,xPerFrame,yPerFrame,turn,gameExit,check,fiftymovescounter=move(returned,current,squ,xPerFrame,yPerFrame,turn,check,fiftymovescounter)
             if gameExit==True:
                 print("exit")
             update(turn)#this effectively paints all the pieces onto a staging board so any changes can display at once. 
@@ -1676,8 +1695,8 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
    
     movedList.close()          
         
-def fiftymoves() :
-    if globalcounter>=50:
+def fiftymoves(fiftymovescounter):
+    if fiftymovescounter>=50:
         gameExit=gameover()
         return gameExit
     return False
@@ -1759,8 +1778,7 @@ if __name__=="__main__":
         turn='white'
         globalwcastle=True
         globalbcastle=True
-        globalcounter=0
-        globalenpassant=False
+        
         start(turn)
-
+        print("restarting")
 
