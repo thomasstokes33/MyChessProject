@@ -702,6 +702,8 @@ class King(piece):
         self.colour=colour
         self.checkmateAlg=False
         self.checkmateMoves=False
+        self.queenside=None
+        self.kingside=None
         if self.colour=='black':
             self.image=pygame.image.load("blackking.png")
             chessDisplay.blit(self.image,((self.posx)*75,top))
@@ -709,6 +711,8 @@ class King(piece):
             self.image=pygame.image.load('whiteking.png')        
             chessDisplay.blit(self.image,((self.posx)*75,bottom))
     def get_moves(self,xPerFrame,yPerFrame,turn,check):
+        self.kingside=None
+        self.queenside=None
         if str(self.colour)==turn:
                 availableSquarex=[]
                 availableSquares=[]
@@ -732,7 +736,8 @@ class King(piece):
                         if theboard.emptySquare(self.posx+1,self.posy)==True and theboard.emptySquare(self.posx+2,self.posy)==True:#checks if squares between are empty
                             if self.minicheck(theboard.board,self.colour,self.posx+1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx+2,self.posy)==False:#king can't move into or through check
                                 availableSquares.append(str(self.colour)[0]+"kingside")
-                                
+                                self.kingside=self.colour+'k'
+
                             else:#this is printed if minicheck is true for any of the squares.
                                 print("castling not available")
                     #queenside
@@ -740,8 +745,8 @@ class King(piece):
                     if queenside[1:5]=='rook' and eval(queenside).movedyet==False:#if it is a rook and it has moved then it will fail this if statement.
                         if theboard.emptySquare(self.posx-1,self.posy)==True and theboard.emptySquare(self.posx-2,self.posy)==True and theboard.emptySquare(self.posx-3,self.posy)==True:
                             if self.minicheck(theboard.board,self.colour,self.posx-1,self.posy)==False and self.minicheck(theboard.board,self.colour,self.posx-2,self.posy)==False and  self.minicheck(theboard.board,self.colour,self.posx-3,self.posy)==False:
-                                    
                                     availableSquares.append(str(self.colour)[0]+"queenside")
+                                    self.queenside=self.colour+'q'
                             else:#this is printed if minicheck is true for any of the squares.
                                 print("castling not available")
                
@@ -1301,6 +1306,7 @@ class Pawn(piece):
         self.checkmateAlg=False
         self.enpassant=''
         self.checkmateMoves=False
+        self.canEnPassant=None
         if self.colour=='black':
             self.image=pygame.image.load("blackpawn.png")
             chessDisplay.blit(self.image,((self.posx)*75,top2))
@@ -1311,6 +1317,8 @@ class Pawn(piece):
 
     def get_moves(self,xPerFrame,yPerFrame,turn,check):#pawn can move forward two on first turn and then one. It can take pieces diagonally
         #in front of it
+         self.enpassant=''
+         self.canEnPassant=None
          if str(self.colour)==turn: #This checks that the clicked piece belongs to the player whose turn it is.
           
                 availableSquares=[]
@@ -1405,6 +1413,7 @@ class Pawn(piece):
                                         availableSquares.append(squarey)
                                         availableSquarex.append(squarex)
                                         self.enpassant=squarex,squarey
+                                        self.canEnPassant=True
                                  
 
 
@@ -1523,19 +1532,17 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fift
                     gameExit,check,fiftymovescounter=checkAlg(turn,check,fiftymovescounter)
                     boardState=open("boardstate.txt","a+")
                     string="\n"+str(theboard.currentBoard())+turn
+                    moveablepieces=moveablePieces(turn,check)
                     
-                    globalwcastle=False
-                    globalbcastle=False
-                    canCastle(turn,check)
-                    canEnPassant()
-                    if globalbcastle==True: #this is for the threefold repetition rule.
-                        string=string+"bcT"
-                    else:
-                        string=string+"bcF"
-                    if globalwcastle==True:
-                        string=string+"wcT"
-                    else:
-                        string=string+"wcF"
+                    
+                    wcastle,bcastle=canCastle(turn,check,moveablepieces)
+                    enpassant=canEnPassant(turn,check,moveablepieces)
+                    if bcastle!=None: #this is for the threefold repetition rule.
+                        string=string+bcastle
+                    if wcastle!=None:
+                        string=string+wcastle
+                    if enpassant!=None:
+                        string=string+str(enpassant)
 
                     boardState.write(string)
                     boardState.close()
@@ -1546,8 +1553,8 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fift
                     if check==False:
                         print("Checking for stalemate...")
                         gameExit=stalemate(turn,check)    #if neither player is in check then this algorithm runs.      
-                        if gameExit==False:
-                            gameExit=draw(turn,check,fiftymovescounter)
+                    if gameExit==False:
+                        gameExit=draw(turn,check,fiftymovescounter)
 
 
         except SyntaxError:
@@ -1673,7 +1680,7 @@ def start(turn): #this function is the main game loop and repeats over and over 
     boardState=open("boardstate.txt","w")
     boardState.write("boardstate")
     fiftymovescounter=0 
-    boardState.write("\n"+str(theboard.currentBoard())+turn+'bcF'+'wcF')###to do
+    boardState.write("\n"+str(theboard.currentBoard())+turn)###to do
     boardState.close()
     update(turn)
     pygame.display.update()
@@ -1735,27 +1742,48 @@ def threefoldRep():
 def insufficientMaterial():
     pass
 
-def canCastle(turn,check):
-    if turn=='white': #This small section gets all the next player's pieces to see if they can make any legal moves.
+def canCastle(turn,check,moveablePieces):
+
+    for piece in moveablePieces:
+        if eval(piece).ptype=='king':
+            eval(piece).checkmateMoves=True
+            eval(piece).get_moves(5,5,turn,check)
+            eval(piece).checkmateMoves=False
+            kingside=None
+            queenside=None
+            if eval(piece).kingside!=None:
+                kingside=eval(piece).kingside
+            if eval(piece).queenside!=None:
+                queenside=eval(piece).queenside
+            return queenside,kingside
+
+def canEnPassant(turn,check,moveablepieces):
+    enpassant=''
+    for piece in moveablepieces:
+        if eval(piece).ptype=='pawn':
+            eval(piece).checkmateMoves=True
+            eval(piece).get_moves(5,5,turn,check)
+            eval(piece).checkmateMoves=False
+            if eval(piece).canEnPassant ==True:
+                enpassant=enpassant+piece+'e'
+    if enpassant=='':
+        enpassant=None
+    return enpassant
+def moveablePieces(turn,check):
+    if turn=='white': 
         start=-1
-        increment=-1 #The start and increment are different because all pieces of the same colour are stored next to each other in the list.
+        increment=-1 
     else:
         start=0
         increment=1
-    item=turn#initiates loop
+    item=turn
     moveablePieces=[]
     while item[0]==turn[0]:
         if item!=turn:
             moveablePieces.append(item)
         item=allPieces[start]
         start=start+increment
-    for piece in moveablePieces:
-        if eval(piece).ptype=='king':
-            eval(piece).checkmateMoves=True
-            eval(piece).get_moves(5,5,turn,check)
-            eval(piece).checkmateMoves=False
-def canEnPassant():
-    pass
+    return moveablePieces
 
 
 if __name__=="__main__":
