@@ -110,3 +110,5 @@ function minicheck(board,colour) {
 //i forgot about the != operator.
 //talk about big o notation of inserting into list at beginning as all items have to shift up one.
 //using hashing for board state.
+
+//I tested as I went along

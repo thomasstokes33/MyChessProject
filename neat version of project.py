@@ -291,8 +291,7 @@ class piece():
         counter=0
         SquareToMoveTo=None,None
         xPerFrame,yPerFrame=None,None
-        print(availableSquarex)
-        print(availableSquarey)
+        
         for item in availableSquarey:
             if SquareToMoveTo== (None,None):
                 try:
@@ -1558,7 +1557,7 @@ def move(moving1,currentmovingpiece,SquareTo,xPerFrame,yPerFrame,turn,check,fift
 
 
         except SyntaxError:
-                print(mousex,mousey,"Square empty")
+                print(mousex,mousey,"Square empty or bottom bar")
                 print()
     try:
         
