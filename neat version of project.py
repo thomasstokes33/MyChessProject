@@ -1610,7 +1610,7 @@ def checkAlg(turn,check,fiftymovescounter):#This functions in a similar manner t
     gameExit=False
     if turn=='white':
         if wking.minicheck(board,turn,thex,they)==True:
-            print("check on white")
+            print("CHECK on white")
             check=True
             print(dangerPieces)
             if wking.checkmate(turn,check)==True:
@@ -1618,7 +1618,7 @@ def checkAlg(turn,check,fiftymovescounter):#This functions in a similar manner t
                 gameExit=gameover()
     else:
         if bking.minicheck(board,turn,thex,they)==True:
-            print("check on black")
+            print("CHECK on black")
             check=True
             if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
