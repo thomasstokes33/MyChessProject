@@ -575,7 +575,7 @@ class piece():
             
             posx=originalx
             posy=originaly
-            if y==0:#was x ==0 which caused errors.
+            if y==0:##was x ==0 which caused errors.
                 
                 pass
             else:
@@ -1620,6 +1620,7 @@ def checkAlg(turn,check,fiftymovescounter):#This functions in a similar manner t
         if bking.minicheck(board,turn,thex,they)==True:
             print("CHECK on black")
             check=True
+            print(dangerPieces)
             if bking.checkmate(turn,check)==True:
                 print("CHECKMATE")
                 gameExit=gameover()
@@ -1660,6 +1661,7 @@ def stalemate(turn,check):#turn here represents the next player
     return gameExit
 
 def draw(check,turn,fiftymovescounter):
+    print("checking for a draw")
     if insufficientMaterial()==True:
         gameExit=gameover()
         return gameExit
@@ -1715,6 +1717,7 @@ def updatemovedlist(piece):#I added this function so that there is one place whe
 def fiftymoves(fiftymovescounter):
     print("---moves counter:",fiftymovescounter)
     if fiftymovescounter>=50:
+        print("fiftymovescounter")
         gameExit=gameover()
         return gameExit
     return False
@@ -1738,7 +1741,7 @@ def threefoldRep():
         return True
     return False
         
-def insufficientMaterial():
+def insufficientMaterial():##Improvement
     pass
 
 def canCastle(turn,check,moveablePieces):

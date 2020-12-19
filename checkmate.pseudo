@@ -112,3 +112,7 @@ function minicheck(board,colour) {
 //using hashing for board state.
 
 //I tested as I went along
+//rules attatched or button that opens them.
+//there are different ways to solve the same problem as demonstrated by my rook and bishop. You could also do it so that with queen get moves
+//you could use 2 nested for loops but just remove the current square the piece is on.
+//I learnt a bit to understand errors rather than bodge
