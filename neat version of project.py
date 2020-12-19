@@ -812,9 +812,7 @@ class King(piece):
         for item in range(len(dangerPieces)):
             dangerPieces.pop(0)        
         for x in dangerPiecesRecord: 
-            
 
-            
             try:
                 posx,posy=eval(x).coordinates() #This line and the exception/catch are used to get the coordinates of the pieces or squares that
                 #can be used to block threats.
@@ -830,7 +828,13 @@ class King(piece):
             self.checkmateAlg=True#This ensures only the pieces are added that can save the king opposed to the empty squares.
             self.minicheck(board,tempTurn,posx,posy)#This adds to the now empty dangerPieces any pieces that can block or take pieces threatening the king.
             self.checkmateAlg=False
-           
+            ychange=[-1,1]
+            for y in ychange:#This checks if pawns can block the threatening piece
+                if theboard.enemysquare(tempTurn,posx,posy+y):
+                    thepiece=getpiece(board,posx,posy+y)
+                    if (thepiece[1]=='p')and ((thepiece[0]=='b' and posy>posy+y) or (thepiece[0]=='w' and posy<posy+posy)):
+                        dangerPieces.append(thepiece)            
+            
 
         
         dangerPiecesRecord=[]
