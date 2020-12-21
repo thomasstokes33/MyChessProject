@@ -1803,7 +1803,7 @@ if __name__=="__main__":
                 'wpawn2', 'wpawn3', 'wpawn4', 'wpawn5', 'wpawn6', 'wpawn7', 'wpawn8', 'wrook1', 'wknight1',
                 'wbishop1', 'wking', 'wqueen', 'wbishop2', 'wknight2', 'wrook2']
         theboard=board1()
-        chessBoard=pygame.image.load('board4.png')
+        chessBoard=pygame.image.load('board5.png')
         chessDisplay.blit(chessBoard,(0,0))
         theboard.display()
         print()
