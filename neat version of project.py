@@ -370,7 +370,8 @@ class piece():
             current_piece=current_piece+'1'#This is used for 'en passant' to symbolise that it is the pawn's first move.
                  
         updatemovedlist(current_piece)
-
+        update(turn)
+        pygame.display.update()
         return False,fiftymovescounter
     
     def distancePerFrame(self,movetox,movetoy):
@@ -515,7 +516,7 @@ class piece():
         originaly=posy
         for y in range(-1,2): #These for loops provide the increment in x and y for the scanning loop. 
             posx=originalx
-            posy=originaly
+            posy=originaly#This resets the x and y origin
             if (y==0): ##I had an error where this was x opposed to y. 
                 pass
             else:
@@ -816,7 +817,7 @@ class King(piece):
             try:
                 posx,posy=eval(x).coordinates() #This line and the exception/catch are used to get the coordinates of the pieces or squares that
                 #can be used to block threats.
-                #I got the name of the actual threat because it made the error checking easier.
+                ##I got the name of the actual threat because it made the error checking easier.
             except TypeError:
                 posx,posy=x[0],x[1]    
             
@@ -846,7 +847,7 @@ class King(piece):
                 dangerPiecesRecord.append(minilist)
             else:
                 dangerPiecesRecord.append(items)      #this for loop creates a duplicate list          
-        
+        print (dangerPiecesRecord)
         for item in dangerPiecesRecord: #The duplicate list is used so if any of the minicheck sub algorithms run it doesn't change the list.
             
             eval(item).checkmateMoves=True
