@@ -1796,6 +1796,9 @@ def moveablePieces(turn,check):
 if __name__=="__main__":
     while True: 
         #this creates the game and classes. 
+        print("CLICK on pieces to select them. Click in the highlighted squares to move the selected piece to that square.")
+        print("Clicking in any other square will deselect the piece.")
+        print("The rules: https://en.wikipedia.org/wiki/Rules_of_chess")
         movedList=open("movedList.txt","w")
         movedList.write("movedlist")
         movedList.close()
